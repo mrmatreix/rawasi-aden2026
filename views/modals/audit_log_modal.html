@@ -1,0 +1,53 @@
+<!-- ================== نافذة سجل التدقيق والرقابة المالية (Audit Trail Modal) ================== -->
+<div id="auditLogModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 1050px; width: 95%;">
+    <div class="modal-header">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 1.4rem;">🛡️</span>
+        <h3 style="color: var(--gold-light); margin: 0;">سجل التدقيق والرقابة المالية (Audit Trail)</h3>
+      </div>
+      <button type="button" class="btn-close" data-action="close-modal" data-modal="auditLogModal" onclick="App.closeModal('auditLogModal')">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0;">
+          توثيق آلي غير قابل للتعديل لجميع العمليات والحركات المالية والإدارية (من عدّل، ماذا، متى، ومن أي جهاز وIP).
+        </p>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <select id="auditLogFilterEntity" class="form-control" style="width: auto; padding: 4px 10px;" onchange="Accounting.loadAuditLogs()">
+            <option value="">كافة الكيانات</option>
+            <option value="journal_entry">القيود اليومية</option>
+            <option value="period">الفترات المحاسبية</option>
+            <option value="bill">الفواتير والمستخلصات</option>
+            <option value="payment">سندات الصرف والقبض</option>
+            <option value="cost_center">مراكز التكلفة</option>
+            <option value="account">دليل الحسابات</option>
+          </select>
+          <button class="btn btn-sm btn-secondary" onclick="Accounting.loadAuditLogs()">🔄 تحديث</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>التاريخ والوقت</th>
+              <th>المستخدم</th>
+              <th>نوع الحركة</th>
+              <th>الكيان المالي</th>
+              <th>الرقم / المعرف</th>
+              <th>تفاصيل التعديل والبيانات</th>
+              <th>عنوان IP</th>
+            </tr>
+          </thead>
+          <tbody id="auditLogsTableBody">
+            <tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">جاري التحميل...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="App.closeModal('auditLogModal')">إغلاق</button>
+    </div>
+  </div>
+</div>

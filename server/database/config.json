@@ -1,0 +1,16 @@
+{
+  "dbEngine": "sqlite",
+  "mysql": {
+    "host": "localhost",
+    "port": 3306,
+    "user": "root",
+    "password": "",
+    "database": "rawasi_aden",
+    "waitForConnections": true,
+    "connectionLimit": 20,
+    "queueLimit": 0
+  },
+  "dbPath": "server/database/rawasi_aden.db",
+  "port": 3000,
+  "systemName": "رواسي عدن للهندسة والمقاولات"
+}

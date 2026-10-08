@@ -1,0 +1,758 @@
+<section id="settingsView" class="app-view-section" style="display: none;">
+        <div class="page-header-row">
+          <h2 class="page-title">إعدادات النظام وإدارة المستخدمين والصلاحيات</h2>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="Settings.openNewUserModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <span>إضافة مستخدم جديد +</span>
+            </button>
+            <button class="btn btn-secondary" onclick="Settings.downloadBackup()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+              <span>نسخة احتياطية</span>
+            </button>
+            <button class="btn btn-secondary" onclick="Settings.openRestoreModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+              <span>استعادة نسخة احتياطية</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- شريط تبويبات الإعدادات -->
+        <div class="report-tabs-bar" style="margin-bottom: 20px;">
+          <button class="report-tab-btn active" id="tabBtn_settings_users" onclick="Settings.switchTab('users')">👥 إدارة المستخدمين والصلاحيات</button>
+          <button class="report-tab-btn" id="tabBtn_settings_company" onclick="Settings.switchTab('company')">🏢 بيانات ومعلومات الشركة</button>
+          <button class="report-tab-btn" id="tabBtn_settings_print" onclick="Settings.switchTab('print')">🖨️ تخصيص ورقة الطباعة والتقارير</button>
+          <button class="report-tab-btn" id="tabBtn_settings_backup" onclick="Settings.switchTab('backup')">🛡️ النسخ الاحتياطي والأمان</button>
+        </div>
+
+        <!-- تبويب 1: جدول المستخدمين والصلاحيات -->
+        <div id="pane_settings_users" class="settings-pane">
+          <div class="panel-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; flex-wrap: wrap;">
+              <h3 style="color: var(--gold-light); font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                <span>قائمة المستخدمين وصلاحيات الوصول</span>
+              </h3>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnSecuritySessions" onclick="Auth.openSecuritySessionsModal()" title="إعدادات الأمان وسياسة الجلسات والأجهزة وصلاحية التوكن" style="display: none !important; border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.08); font-weight: 700;">
+                  🛡️ الأمان والجلسات <span id="currentSessionModeBadge" class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; margin-right: 4px;">متعددة (3)</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnLockTimeoutSettings" onclick="Auth.openLockTimeoutModal()" title="تحديد مهلة فترة القفل التلقائي وقفل الشاشة">
+                  ⏱️ مهلة فترة القفل <span id="currentLockTimeoutBadge" class="badge" style="background: rgba(212, 175, 55, 0.2); color: #d4af37; margin-right: 4px;">15 دقيقة</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.08);" onclick="Auth.logout()" title="تسجيل الخروج مع أخذ نسخة احتياطية فورية لقاعدة البيانات">
+                  🚪 تسجيل خروج (نسخ احتياطي)
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="Settings.openNewUserModal()">+ إضافة مستخدم جديد</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>اسم المستخدم</th>
+                    <th>الاسم الكامل</th>
+                    <th>الدور الوظيفي</th>
+                    <th>الهاتف / البريد</th>
+                    <th>الصلاحيات الممنوحة</th>
+                    <th>الحالة</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- تبويب 2: بيانات الشركة -->
+        <div id="pane_settings_company" class="settings-pane" style="display: none;">
+          <div class="panel-card" style="max-width: 800px; margin: 0 auto;">
+            <h3 style="color: var(--gold-light); margin-bottom: 16px; font-size: 1.05rem; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">معلومات وهوية المؤسسة والاتصال</h3>
+            <form id="companySettingsForm" onsubmit="Settings.saveCompanySettings(event)">
+              <div class="form-group">
+                <label>اسم الشركة بالعربي <span style="color: var(--accent-red);">*</span></label>
+                <input type="text" id="setCompanyName" class="form-control" value="رواسي عدن للهندسة والمقاولات" required>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label>رقم الهاتف الرئيسي</label>
+                  <input type="text" id="setPhone1" class="form-control" value="773413937">
+                </div>
+                <div class="form-group">
+                  <label>رقم الهاتف الإضافي</label>
+                  <input type="text" id="setPhone2" class="form-control" value="773413937">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label>البريد الإلكتروني</label>
+                  <input type="email" id="setEmail" class="form-control" value="aalwi@engineer.com">
+                </div>
+                <div class="form-group">
+                  <label>العنوان والمركز الرئيسي</label>
+                  <input type="text" id="setAddress" class="form-control" value="عدن - الجمهورية اليمنية">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>الشعار اللفظي (Slogan)</label>
+                <input type="text" id="setSlogan" class="form-control" value="نبني الحاضر لنستثمر المستقبل">
+              </div>
+              <div style="margin-top: 18px; text-align: left;">
+                <button type="submit" class="btn btn-primary">حفظ وتحديث بيانات الشركة</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- تبويب 3: تخصيص ورقة الطباعة والتقارير -->
+        <div id="pane_settings_print" class="settings-pane" style="display: none;">
+          <div class="print-settings-layout">
+            
+            <!-- العمود الأول: نموذج إعدادات وتخصيص الطباعة -->
+            <div class="panel-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                <h3 style="color: var(--gold-light); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin: 0;">
+                  <svg class="icon" width="20" height="20"><use href="#icon-print"></use></svg>
+                  <span>تخصيص وترويسة أوراق الطباعة والتقارير الشاملة</span>
+                </h3>
+                <span style="font-size: 0.76rem; background: rgba(212,175,55,0.12); color: var(--gold-light); padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(212,175,55,0.3);">
+                  تحكم كامل بجميع أوراق ومستندات النظام 🖨️
+                </span>
+              </div>
+
+              <form id="printSettingsForm" onsubmit="Settings.savePrintSettings(event)">
+                
+                <!-- 1. قسم ترويسة وهوية الورقة والخطوط -->
+                <div class="print-settings-section-card">
+                  <h4>🏢 1. الهوية والترويسة والخطوط العامة:</h4>
+                  
+                  <div class="form-group">
+                    <label>اسم المؤسسة / الشركة في الترويسة <span style="color: var(--accent-red);">*</span></label>
+                    <input type="text" id="printHeaderTitle" class="form-control" placeholder="شركة رواسي عدن للهندسة والمقاولات" oninput="Settings.updatePrintPreview()">
+                  </div>
+
+                  <div class="form-group">
+                    <label>الاسم باللغة الإنجليزية (English Subtitle)</label>
+                    <input type="text" id="printHeaderEn" class="form-control" placeholder="Rawasi Aden for Engineering & Contracting" oninput="Settings.updatePrintPreview()">
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                      <label>العنوان والاتصال في الترويسة</label>
+                      <input type="text" id="printHeaderSubtitle" class="form-control" placeholder="عدن - الجمهورية اليمنية | هاتف: 773413937" oninput="Settings.updatePrintPreview()">
+                    </div>
+                    <div class="form-group">
+                      <label>السجل التجاري / الرقم الضريبي</label>
+                      <input type="text" id="printTaxNo" class="form-control" placeholder="س.ت: 102948 - ر.ض: 3004918" oninput="Settings.updatePrintPreview()">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>الشعار اللفظي (Slogan)</label>
+                    <input type="text" id="printSlogan" class="form-control" placeholder="نبني الحاضر لنستثمر المستقبل" oninput="Settings.updatePrintPreview()">
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <div class="form-group">
+                      <label>حجم الشعار / الشكل في الترويسة</label>
+                      <select id="printLogoSize" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="small">صغير (42px) - مدمج وناعم</option>
+                        <option value="medium" selected>متوسط قياسي (58px) - الافتراضي</option>
+                        <option value="large">كبير بارز (76px)</option>
+                        <option value="xlarge">كبير جداً (95px)</option>
+                        <option value="full">عريض وواضح (115px)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label>نوع خط ورقة الطباعة والتقارير (Font Family)</label>
+                      <select id="printFontFamily" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="Cairo" selected>خط كايرو (Cairo) - عصري فائق الوضوح</option>
+                        <option value="Tajawal">خط تجوال (Tajawal) - رسمي وأنيق للشركات</option>
+                        <option value="Almarai">خط المراعي (Almarai) - هندسي نظيف</option>
+                        <option value="Amiri">خط أميري (Amiri) - كلاسيكي رسمي فخم</option>
+                        <option value="Changa">خط تشانغا (Changa) - عريض وبارز</option>
+                        <option value="Tahoma">خط تاهوما (Tahoma) - خط النظام الافتراضي</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>مقياس حجم الخط العام</label>
+                      <select id="printFontSizeScale" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="compact">مضغوط (90%)</option>
+                        <option value="normal" selected>قياسي (100%)</option>
+                        <option value="large">كبير (112%)</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>لون عناوين الأقسام والتمييز</label>
+                      <select id="printAccentColor" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="#d4af37">ذهبي ملكي (#d4af37)</option>
+                        <option value="#0f2744">كحلي داكن رسمي (#0f2744)</option>
+                        <option value="#059669">أخضر زمردي (#059669)</option>
+                        <option value="#dc2626">عنابي داكن (#dc2626)</option>
+                        <option value="#000000">أسود رسمي كلاسيكي</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>نمط إطار الورقة الخارجي</label>
+                      <select id="printBorderStyle" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="classic">إطار رسمي كلاسيكي (مزدوج أنيق)</option>
+                        <option value="modern">إطار عصري رفيع (Modern Line)</option>
+                        <option value="minimal">إطار رمادي بسيط (Minimal)</option>
+                        <option value="none">بدون إطار خارجي (Clean Borderless)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. قسم تخصيص سندات القبض والصرف -->
+                <div class="print-settings-section-card">
+                  <h4>💵 2. تخصيص سندات القبض والصرف (Vouchers):</h4>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>مسمى سند القبض في الترويسة</label>
+                      <input type="text" id="printReceiptTitle" class="form-control" placeholder="سـنـد قـبـض رسـمـي" oninput="Settings.updatePrintPreview()">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>مسمى سند الصرف في الترويسة</label>
+                      <input type="text" id="printExpenseTitle" class="form-control" placeholder="سـنـد صـرف رسـمـي" oninput="Settings.updatePrintPreview()">
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 12px;">
+                    <label>نمط وحجم طباعة السند</label>
+                    <select id="printVoucherLayout" class="form-control" onchange="Settings.updatePrintPreview()">
+                      <option value="single_a4" selected>صفحة كاملة A4 (نسخة واحدة كاملة ومريحة للقراءة)</option>
+                      <option value="dual_a4">سندان في ورقة A4 واحدة مقسومة (نسخة للعميل + نسخة للأرشيف لتوفير الورق)</option>
+                      <option value="half_a5">قياس نصف صفحة A5 (مدمج)</option>
+                    </select>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printVoucherShowTafqeet" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار التفقيط (المبلغ كتابة بالحروف)</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printVoucherShowProject" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار حقل المشروع المرتبط بالسند</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printVoucherShowPaymentMethod" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار حقل طريقة الدفع (نقداً / شيك / بنك)</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printVoucherShowChequeRef" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار رقم المرجع / الشيك إن وجد</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 3. قسم تخصيص كشوفات حسابات العملاء والموردين -->
+                <div class="print-settings-section-card">
+                  <h4>👥 3. تخصيص كشوفات حسابات العملاء والموردين:</h4>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printStmtShowSummaryCard" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار بطاقة الملخص الإجمالي أعلى الكشف (المسحوبات، المدفوعات، الرصيد)</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printStmtShowRunningBalance" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار عمود الرصيد التراكمي في كل حركة</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printStmtShowReference" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار أرقام المراجع والسندات والفواتير</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printStmtShowNotes" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار بيان وملاحظات الحركة التفصيلية</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printStmtShowMatchSig" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار حقل توقيع ومصادقة مطابقة الرصيد</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 4. قسم تخصيص تقارير الحسابات والمشاريع الشاملة -->
+                <div class="print-settings-section-card">
+                  <h4>🏗️ 4. تخصيص تقارير وبيانات المشاريع الشاملة:</h4>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printProjShowKpiCards" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار بطاقات مؤشرات المشروع المالية (العقد، التكلفة، المسدد، المتبقي، الإنجاز)</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printProjShowExpensesTable" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار جدول المصروفات المباشرة للمشروع</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printProjShowSupplierBills" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار جدول فواتير ومشتريات الموردين التابعة للمشروع</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printProjShowClientPayments" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار جدول مقبوضات ودفعات العميل</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printProjShowTasks" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار جدول مراحل ومهام العمل بالمشروع</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 5. قسم تخصيص القوائم والتقارير المالية -->
+                <div class="print-settings-section-card">
+                  <h4>📊 5. تخصيص القوائم والتقارير المالية:</h4>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printFinShowKpiCards" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار بطاقات ملخص الإيرادات والمصروفات وصافي الأرباح</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printFinShowExpenseBreakdown" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار جدول تحليل وتوزيع بنود المصروفات ونسبتها</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printFinShowDualBalance" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار جدول مقارنة الأصول والالتزامات جنباً إلى جنب في الميزانية</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 6. قسم التوقيعات والاعتمادات والأختام والتذييل -->
+                <div class="print-settings-section-card">
+                  <h4>✍️ 6. التواقيع والأختام والتذييل العام:</h4>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>التوقيع الأول (الأيمن)</label>
+                      <input type="text" id="printSig1" class="form-control" placeholder="المستلم / المحاسب" oninput="Settings.updatePrintPreview()">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>التوقيع الثاني (الأوسط)</label>
+                      <input type="text" id="printSig2" class="form-control" placeholder="المدير العام" oninput="Settings.updatePrintPreview()">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>التوقيع الثالث (الأيسر)</label>
+                      <input type="text" id="printSig3" class="form-control" placeholder="اعتماد الإدارة" oninput="Settings.updatePrintPreview()">
+                    </div>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>نمط ترويسة التقارير الطويلة</label>
+                      <select id="printHeaderStyle" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="dynamic" selected>ترويسة ذكية متعددة الصفحات (موصى به للتقارير الطويلة لمنع التشوه)</option>
+                        <option value="letterhead">ترويسة الورقة المروّسة الكاملة (مناسب للسندات صفحة واحدة)</option>
+                        <option value="plain">بدون ترويسة (للطباعة على ورق الشركة المطبوع مسبقاً)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>موقع ظهور التواقيع في التقارير الطويلة</label>
+                      <select id="printSigPosition" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="end" selected>في نهاية التقرير فقط (الصفحة الأخيرة - لمنع تكرار وتداخل التواقيع)</option>
+                        <option value="all">في كل صفحة من صفحات التقرير</option>
+                        <option value="none">بدون تواقيع في التقارير الحسابية</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>حجم الخط وكثافة الجداول</label>
+                      <select id="printTableDensity" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="compact">مضغوط (8.5pt) - للتقارير الكبيرة لتوفير الورق</option>
+                        <option value="medium" selected>متوسط متوازن (9.5pt) - الافتراضي</option>
+                        <option value="large">كبير عالي الوضوح (10.5pt)</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>هوامش ورقة الطباعة (Margins)</label>
+                      <select id="printPageMargins" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="narrow">هوامش ضيقة (6mm) - أقصى مساحة للبيانات</option>
+                        <option value="normal" selected>هوامش قياسية متوازنة (12mm)</option>
+                        <option value="wide">هوامش واسعة (18mm)</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>اتجاه الطباعة الافتراضي</label>
+                      <select id="printOrientation" class="form-control" onchange="Settings.updatePrintPreview()">
+                        <option value="portrait" selected>عمودي (Portrait A4 - الافتراضي)</option>
+                        <option value="landscape">أفقي (Landscape A4 - للجداول العريضة)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printShowLogo" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار شعار الشركة أعلى الترويسة</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printShowStamp" onchange="Settings.updatePrintPreview()">
+                      <span>إظهار موضع الختم الرسمي الدائري</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printShowPageNumbers" checked onchange="Settings.updatePrintPreview()">
+                      <span>ترقيم الصفحات التلقائي (صفحة X من Y)</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem;">
+                      <input type="checkbox" id="printShowPrintTime" checked onchange="Settings.updatePrintPreview()">
+                      <span>إظهار تاريخ ولحظة الطباعة في التذييل</span>
+                    </label>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>نص وملاحظات التذييل أسفل السندات والتقارير</label>
+                    <textarea id="printFooterNotes" class="form-control" rows="2" placeholder="تعتبر هذه السندات والوثائق رسمية ولا يعتمد أي كشط أو تعديل بدون ختم الإدارة" oninput="Settings.updatePrintPreview()"></textarea>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-secondary" onclick="Settings.resetDefaultPrintSettings()">
+                    <span>استعادة الافتراضي 🔄</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="Settings.printCurrentPreviewDoc()">
+                    <span>طباعة النموذج المعروض 🖨️</span>
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    <span>حفظ وتطبيق إعدادات الطباعة 💾</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- العمود الثاني: المعاينة الحية والتفاعلية (Live Multi-Document Print Preview) -->
+            <div class="print-preview-sticky">
+              <div class="print-preview-title-bar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span style="font-weight: 700; font-size: 0.88rem; color: #0f2744;">👁️ المعاينة الحية والمباشرة للأوراق:</span>
+                <span style="font-size: 0.72rem; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; color: #64748b;">تحديث تلقائي فوري</span>
+              </div>
+              
+              <!-- أزرار التبديل السريع بين نماذج الأوراق المختلفة -->
+              <div class="print-doc-pill-bar" id="printDocSwitcher">
+                <button type="button" class="print-doc-pill active" onclick="Settings.setPreviewDoc('receipt')">💵 سند قبض</button>
+                <button type="button" class="print-doc-pill" onclick="Settings.setPreviewDoc('expense')">💸 سند صرف</button>
+                <button type="button" class="print-doc-pill" onclick="Settings.setPreviewDoc('client_stmt')">👥 كشف حساب عميل</button>
+                <button type="button" class="print-doc-pill" onclick="Settings.setPreviewDoc('supplier_stmt')">🏢 كشف حساب مورد</button>
+                <button type="button" class="print-doc-pill" onclick="Settings.setPreviewDoc('project')">🏗️ تقرير مشروع</button>
+                <button type="button" class="print-doc-pill" onclick="Settings.setPreviewDoc('profit_loss')">📊 أرباح وخسائر</button>
+                <button type="button" class="print-doc-pill" onclick="Settings.setPreviewDoc('balance_sheet')">🏛️ ميزانية عمومية</button>
+              </div>
+
+              <div id="printLivePreviewBox" class="print-preview-box">
+                <!-- سيتم توليد المعاينة الحية للنموذج المختار هنا -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- تبويب 3: النسخ الاحتياطي والأمان وإعدادات قواعد البيانات -->
+        <div id="pane_settings_backup" class="settings-pane" style="display: none;">
+          
+          <!-- بطاقة 1: خيارات الربط السحابي وقاعدة البيانات (Online / Offline) -->
+          <div class="panel-card" style="margin-bottom: 24px; border: 1px solid var(--border-gold);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+              <h3 style="color: var(--gold-light); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; margin: 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                <span>إعدادات الربط السحابي والاتصال بقواعد البيانات (Online / Offline)</span>
+              </h3>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="Settings.loadDbConfig()">تحديث الحالة 🔄</button>
+            </div>
+
+            <div id="dbConfigStatusBox" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 18px;">
+              <!-- سيتم تعبئتها بواسطة Settings.loadDbConfig() -->
+            </div>
+
+            <form onsubmit="Settings.saveDbConfig(event)">
+              <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfgDbMode">وضع التشغيل وقاعدة البيانات</label>
+                  <select id="cfgDbMode" class="form-control">
+                    <option value="auto">تلقائي - سحابي مع تحويل محلي عند الانقطاع (موصى به)</option>
+                    <option value="offline_only">أوفلاين محلي فقط (قاعدة بيانات SQLite المحلية فقط)</option>
+                    <option value="online_only">سحابي فقط (تنبيه عند تعذر الاتصال بالسيرفر)</option>
+                  </select>
+                  <small style="color: var(--text-secondary); font-size: 0.72rem; display: block; margin-top: 4px;">الوضع التلقائي يتحقق من السيرفر السحابي فور بدء النظام ويتحول بسلاسة للمحلي عند الحاجة.</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfgOnlineUrl">رابط السيرفر / قاعدة البيانات السحابية (Cloud API / Database URL)</label>
+                  <input type="text" id="cfgOnlineUrl" class="form-control" placeholder="https://api.rawasi-aden.com أو رابط السيرفر السحابي">
+                  <small style="color: var(--text-secondary); font-size: 0.72rem; display: block; margin-top: 4px;">يتم إرسال إشارات فحص استجابة (Ping/Health) دورية وقبل كل عملية مزامنة.</small>
+                </div>
+              </div>
+
+              <div id="onlineDbTestResult" style="display: none; padding: 12px; border-radius: var(--radius-sm); background: rgba(0,0,0,0.2); border: 1px solid var(--border-light); margin-bottom: 16px;"></div>
+
+              <div style="display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap;">
+                <button type="button" id="btnTestOnlineDb" class="btn btn-secondary" onclick="Settings.testOnlineDb()">
+                  <span>فحص الاتصال والتحقق الآن 🔍</span>
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <span>حفظ وتطبيق إعدادات الاتصال 💾</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- بطاقة مميزة: إدارة وترحيل قاعدة بيانات MySQL (MySQL Enterprise & Migration) -->
+          <div class="panel-card" style="margin-bottom: 24px; border: 1px solid var(--border-gold); background: linear-gradient(135deg, rgba(212, 175, 55, 0.04) 0%, rgba(26, 38, 57, 0.3) 100%);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+              <h3 style="color: var(--gold-light); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; margin: 0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 4.02 2 6.5s4.48 4.5 10 4.5 10-2.02 10-4.5S17.52 2 12 2zm0 6c-3.86 0-7-1.34-7-3s3.14-3 7-3 7 1.34 7 3-3.14 3-7 3zm0 4.5c-5.52 0-10-2.02-10-4.5v3c0 2.48 4.48 4.5 10 4.5s10-2.02 10-4.5v-3c0 2.48-4.48 4.5-10 4.5zm0 6c-5.52 0-10-2.02-10-4.5v3c0 2.48 4.48 4.5 10 4.5s10-2.02 10-4.5v-3c0 2.48-4.48 4.5-10 4.5z"/></svg>
+                <span>إدارة وترحيل قاعدة بيانات MySQL الاحترافية (Enterprise MySQL Database)</span>
+              </h3>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="Settings.loadMysqlStatus()">تحديث حالة MySQL 🔄</button>
+            </div>
+
+            <!-- مربع حالة اتصال ومحرك MySQL النشط -->
+            <div id="mysqlStatusBox" style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 18px;">
+              <!-- يتم تحديثه ديناميكياً عبر Settings.loadMysqlStatus() -->
+              <div style="color: var(--text-secondary); font-size: 0.85rem;">جاري فحص حالة خادم ومحرك MySQL...</div>
+            </div>
+
+            <!-- نموذج ضبط بيانات الاتصال بـ MySQL -->
+            <form onsubmit="Settings.saveMysqlSettings(event)">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="mysqlHost">خادم MySQL (Host)</label>
+                  <input type="text" id="mysqlHost" class="form-control" placeholder="localhost" value="localhost" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="mysqlPort">المنفذ (Port)</label>
+                  <input type="number" id="mysqlPort" class="form-control" placeholder="3306" value="3306" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="mysqlUser">المستخدم (Username)</label>
+                  <input type="text" id="mysqlUser" class="form-control" placeholder="root" value="root" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="mysqlPassword">كلمة المرور (Password)</label>
+                  <input type="password" id="mysqlPassword" class="form-control" placeholder="اتركه فارغاً إن لم توجد">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="mysqlDatabase">اسم قاعدة البيانات</label>
+                  <input type="text" id="mysqlDatabase" class="form-control" placeholder="rawasi_aden" value="rawasi_aden" required>
+                </div>
+              </div>
+
+              <!-- مربع نتيجة فحص الاتصال -->
+              <div id="mysqlTestResult" style="display: none; padding: 12px; border-radius: var(--radius-sm); background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); margin-bottom: 16px;"></div>
+
+              <div style="display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; margin-bottom: 20px;">
+                <button type="button" id="btnTestMysql" class="btn btn-secondary" onclick="Settings.testMysqlConnection()">
+                  <span>اختبار الاتصال بـ MySQL 🔍</span>
+                </button>
+                <button type="submit" id="btnSaveMysql" class="btn btn-primary">
+                  <span>حفظ الإعدادات وتفعيل المحرك 💾</span>
+                </button>
+              </div>
+            </form>
+
+            <hr style="border: 0; border-top: 1px dashed var(--border-light); margin: 20px 0;">
+
+            <!-- قسم ترحيل البيانات من SQLite إلى MySQL -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; background: rgba(255, 255, 255, 0.02); padding: 16px; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.2);">
+              <div style="max-width: 650px;">
+                <h4 style="color: var(--gold-light); margin: 0 0 6px 0; font-size: 0.95rem;">ترحيل شامل للبيانات من SQLite إلى MySQL (Data Migration Tool)</h4>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0; line-height: 1.5;">
+                  ينقل هذا الخيار كافة الجداول الـ 31 (المشاريع، المستخلصات، العقود، قيود اليومية، السندات المالية، المخزون، والمستخدمين) من قاعدة SQLite إلى خادم MySQL المنشأ، مع الحفاظ الكامل على المفاتيح الأجنبية وأرصدة الحسابات دون المساس بالبيانات القديمة.
+                </p>
+              </div>
+              <button type="button" id="btnRunMigration" class="btn btn-primary" onclick="Settings.runMysqlMigration()" style="white-space: nowrap;">
+                <span>بدء ترحيل البيانات الآن (Migrate to MySQL) 🚀</span>
+              </button>
+            </div>
+
+            <div id="mysqlMigrationResult" style="display: none; padding: 12px; border-radius: var(--radius-sm); background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); margin-top: 16px;"></div>
+          </div>
+
+          <!-- بطاقة: الجدولة التلقائية للنسخ الاحتياطي ومسار التخزين المعتمد -->
+          <div class="panel-card" style="margin-bottom: 24px; border: 1px solid var(--border-gold); background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(15, 23, 42, 0.6) 100%);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.35rem;">
+                  🛡️
+                </div>
+                <div>
+                  <h3 style="color: var(--gold-light); font-size: 1.1rem; margin: 0; font-weight: 700;">
+                    الجدولة التلقائية للنسخ الاحتياطي ومسار التخزين (Automatic Backup Schedule)
+                  </h3>
+                  <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 2px 0 0 0;">
+                    حفظ نسخ احتياطية دورية لقاعدة البيانات آلياً في فترات يومية أو أسبوعية محددة إلى مسار التخزين المعتمد
+                  </p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="Settings.loadAutoBackupSchedule()">🔄 تحديث الحالة</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="Settings.runAutoBackupNow()" id="btnSettingsRunBackupNow" style="background: #10b981; border-color: #10b981;">⚡ نسخ احتياطي فوري الآن</button>
+              </div>
+            </div>
+
+            <!-- بطاقة الحالة اللحظية للنسخ المجدول -->
+            <div id="autoBackupStatusBox" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 20px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                <div>
+                  <span style="color: var(--text-secondary); font-size: 0.78rem; display: block;">حالة الجدولة الآلية:</span>
+                  <strong id="liveBackupStatusBadge" style="font-size: 0.95rem; color: #4ade80;">🟢 مفعل ومنتظم</strong>
+                </div>
+                <div>
+                  <span style="color: var(--text-secondary); font-size: 0.78rem; display: block;">التكرار والموعد:</span>
+                  <strong id="liveBackupIntervalText" style="font-size: 0.95rem; color: #f8fafc;">يومياً في تمام 02:00 ص</strong>
+                </div>
+                <div>
+                  <span style="color: var(--text-secondary); font-size: 0.78rem; display: block;">آخر نسخة تم حفظها:</span>
+                  <strong id="liveBackupLastRunText" style="font-size: 0.95rem; color: var(--gold-light);">-</strong>
+                </div>
+                <div>
+                  <span style="color: var(--text-secondary); font-size: 0.78rem; display: block;">موعد النسخة القادمة:</span>
+                  <strong id="liveBackupNextRunText" style="font-size: 0.95rem; color: var(--accent-blue);">-</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- نموذج إعدادات الجدولة والمسار -->
+            <form id="autoBackupScheduleForm" onsubmit="Settings.saveAutoBackupSchedule(event)">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                <!-- تفعيل / تعطيل -->
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfgAutoBackupEnabled" style="font-weight: 600;">تفعيل النسخ الاحتياطي التلقائي</label>
+                  <select id="cfgAutoBackupEnabled" class="form-control" onchange="Settings.toggleAutoBackupFields()">
+                    <option value="true">✅ نعم - تفعيل الجدولة التلقائية</option>
+                    <option value="false">❌ تعطيل الجدولة التلقائية مؤقتاً</option>
+                  </select>
+                </div>
+
+                <!-- الفاصل الزمني (يومي / أسبوعي) -->
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfgAutoBackupInterval" style="font-weight: 600;">فترة التكرار المجدولة</label>
+                  <select id="cfgAutoBackupInterval" class="form-control" onchange="Settings.toggleAutoBackupFields()">
+                    <option value="daily">📅 يومياً (Daily)</option>
+                    <option value="weekly">📆 أسبوعياً (Weekly)</option>
+                  </select>
+                </div>
+
+                <!-- يوم الأسبوع (في حال أسبوعي) -->
+                <div class="form-group" id="cfgAutoBackupDayGroup" style="margin-bottom: 0; display: none;">
+                  <label for="cfgAutoBackupDayOfWeek" style="font-weight: 600;">يوم التنفيذ الأسبوعي</label>
+                  <select id="cfgAutoBackupDayOfWeek" class="form-control">
+                    <option value="5">الجمعة (موصى به في نهاية أسبوع العمل)</option>
+                    <option value="4">الخميس</option>
+                    <option value="6">السبت</option>
+                    <option value="0">الأحد</option>
+                    <option value="1">الاثنين</option>
+                    <option value="2">الثلاثاء</option>
+                    <option value="3">الأربعاء</option>
+                  </select>
+                </div>
+
+                <!-- وقت التنفيذ -->
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfgAutoBackupTime" style="font-weight: 600;">وقت تنفيذ النسخ (الساعة والدقيقة)</label>
+                  <input type="time" id="cfgAutoBackupTime" class="form-control" value="02:00" required>
+                  <small style="color: var(--text-secondary); font-size: 0.72rem; display: block; margin-top: 4px;">يُفضل اختيار وقت هدوء النظام كالساعة 02:00 صباحاً.</small>
+                </div>
+
+                <!-- أقصى عدد نسخ للاحتفاظ بها -->
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfgAutoBackupMaxFiles" style="font-weight: 600;">سياسة الاحتفاظ (عدد النسخ)</label>
+                  <select id="cfgAutoBackupMaxFiles" class="form-control">
+                    <option value="7">الاحتفاظ بآخر 7 نسخ</option>
+                    <option value="14" selected>الاحتفاظ بآخر 14 نسخة (أسبوعين)</option>
+                    <option value="30">الاحتفاظ بآخر 30 نسخة (شهر)</option>
+                    <option value="60">الاحتفاظ بآخر 60 نسخة (شهرين)</option>
+                  </select>
+                  <small style="color: var(--text-secondary); font-size: 0.72rem; display: block; margin-top: 4px;">يتم حذف النسخ الأقدم تلقائياً للحفاظ على مساحة القرص.</small>
+                </div>
+              </div>
+
+              <!-- مسار التخزين المعتمد -->
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label for="cfgAutoBackupPath" style="font-weight: 600; display: flex; justify-content: space-between;">
+                  <span>مسار التخزين على القرص (Configured Storage Path)</span>
+                  <span id="cfgAutoBackupPathStatus" style="font-size: 0.8rem; font-weight: normal;"></span>
+                </label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="cfgAutoBackupPath" class="form-control" placeholder="مثال: server/database/backups أو مسار مخصص على القرص" style="direction: ltr; font-family: monospace;" required>
+                  <button type="button" class="btn btn-secondary" onclick="Settings.testStoragePath()" style="white-space: nowrap;">📁 فحص المسار</button>
+                  <button type="button" class="btn btn-secondary" onclick="Settings.resetDefaultStoragePath()" title="استعادة المسار الافتراضي" style="white-space: nowrap;">↩️ افتراضي</button>
+                </div>
+                <small style="color: var(--text-secondary); font-size: 0.75rem; display: block; margin-top: 4px;">
+                  يمكن تحديد أي مجلد على السيرفر أو القرص المحلي. سيقوم النظام بإنشاء المجلد تلقائياً والتأكد من أذونات الكتابة.
+                </small>
+              </div>
+
+              <div id="autoBackupTestResultBox" style="display: none; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 0.82rem;"></div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="submit" class="btn btn-primary" id="btnSaveAutoBackupConfig">
+                  <span>💾 حفظ وتطبيق إعدادات الجدولة والمسار</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- بطاقة 2: تحميل واستعادة النسخ العامة -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+            <div class="panel-card" style="text-align: center; padding: 25px;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--gold-primary)" style="margin-bottom: 12px;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+              <h3 style="color: #fff; margin-bottom: 8px;">تنزيل نسخة احتياطية كاملة</h3>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 18px; line-height: 1.5;">قم بتحميل نسخة احتياطية فورية من كافة بيانات ومشاريع وحسابات نظام رواسي عدن والاحتفاظ بها على جهازك بأمان.</p>
+              <button type="button" class="btn btn-primary" onclick="Settings.downloadBackup()">تنزيل النسخة الآن (SQLite .db)</button>
+            </div>
+
+            <div class="panel-card" style="text-align: center; padding: 25px;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--accent-blue)" style="margin-bottom: 12px;"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+              <h3 style="color: #fff; margin-bottom: 8px;">استعادة قاعدة البيانات</h3>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 18px; line-height: 1.5;">استرجاع قاعدة البيانات من ملف احتياطي خارجي أو من النسخ السابقة المخزنة على الخادم مع نظام أمان متقدم.</p>
+              <button type="button" class="btn btn-secondary" onclick="Settings.openRestoreModal()">فتح معالج الاستعادة</button>
+            </div>
+          </div>
+
+          <!-- بطاقة 3: جدول نسخ تسجيل الخروج التلقائية لحفظ أحدث التعديلات -->
+          <div class="panel-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h3 style="color: var(--gold-light); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                  <span>سجل نسخ الخروج التلقائية (حفظ أحدث التعديلات)</span>
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0;">يتم إنشاء هذه النسخ آلياً عند تسجيل كل خروج للمستخدم لضمان العودة إلى آخر حالة عمل كان عليها المشروع سواءً أونلاين أو أوفلاين.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="Settings.loadLogoutBackups()">تحديث السجل 🔄</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>اسم ملف النسخة والبيان</th>
+                    <th>المستخدم</th>
+                    <th>وقت الخروج والحفظ</th>
+                    <th>الحجم</th>
+                    <th>الوضع وقتها</th>
+                    <th style="text-align: center;">الإجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="logoutBackupsTableBody">
+                  <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px; color: var(--text-secondary);">جاري تحميل السجل...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>

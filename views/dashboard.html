@@ -1,0 +1,531 @@
+<section id="dashboardView" class="app-view-section">
+        <div class="page-header-row">
+          <h2 class="page-title">لوحة التحكم الرئيسية</h2>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="Projects.openNewModal()">
+              <svg class="icon" width="16" height="16"><use href="#icon-plus"></use></svg>
+              <span>مشروع جديد +</span>
+            </button>
+            <button class="btn btn-secondary" onclick="Reports.loadDashboardKPIs()">
+              <svg class="icon" width="16" height="16"><use href="#icon-refresh"></use></svg>
+              <span>تحديث البيانات</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- شبكة الـ 8 بطاقات الرئيسية (KPI Cards) -->
+        <div class="kpi-grid">
+          <!-- 1. إجمالي الدخل -->
+          <div class="kpi-card kpi-income">
+            <div class="kpi-content">
+              <span class="kpi-label">إجمالي الدخل</span>
+              <span class="kpi-value skeleton skeleton-text" id="kpiTotalIncome" style="min-width: 90px; display: inline-block;">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg class="icon" width="24" height="24"><use href="#icon-income"></use></svg>
+            </div>
+          </div>
+
+          <!-- 2. إجمالي المصروفات -->
+          <div class="kpi-card kpi-expense">
+            <div class="kpi-content">
+              <span class="kpi-label">إجمالي المصروفات</span>
+              <span class="kpi-value skeleton skeleton-text" id="kpiTotalExpenses" style="min-width: 90px; display: inline-block;">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg class="icon" width="24" height="24"><use href="#icon-expense"></use></svg>
+            </div>
+          </div>
+
+          <!-- 3. صافي الأرباح -->
+          <div class="kpi-card kpi-profit">
+            <div class="kpi-content">
+              <span class="kpi-label">صافي الأرباح</span>
+              <span class="kpi-value skeleton skeleton-text" id="kpiNetProfit" style="min-width: 90px; display: inline-block;">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg class="icon" width="24" height="24"><use href="#icon-profit"></use></svg>
+            </div>
+          </div>
+
+          <!-- 4. رصيد الصندوق -->
+          <div class="kpi-card kpi-cash">
+            <div class="kpi-content">
+              <span class="kpi-label">رصيد الصندوق</span>
+              <span class="kpi-value skeleton skeleton-text" id="kpiCashBalance" style="min-width: 80px; display: inline-block;">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg class="icon" width="24" height="24"><use href="#icon-cash"></use></svg>
+            </div>
+          </div>
+
+          <!-- 5. مستحقات العملاء -->
+          <div class="kpi-card kpi-receivable">
+            <div class="kpi-content">
+              <span class="kpi-label">مستحقات العملاء</span>
+              <span class="kpi-value skeleton skeleton-text" id="kpiClientReceivables" style="min-width: 80px; display: inline-block;">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg class="icon" width="24" height="24"><use href="#icon-receipt"></use></svg>
+            </div>
+          </div>
+
+          <!-- 6. مستحقات الموردين -->
+          <div class="kpi-card kpi-payable">
+            <div class="kpi-content">
+              <span class="kpi-label">مستحقات الموردين</span>
+              <span class="kpi-value skeleton skeleton-text" id="kpiSupplierPayables" style="min-width: 80px; display: inline-block;">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20z"/></svg>
+            </div>
+          </div>
+
+          <!-- 7. المشاريع النشطة -->
+          <div class="kpi-card kpi-active-proj">
+            <div class="kpi-content">
+              <span class="kpi-label">المشاريع النشطة</span>
+              <span class="kpi-value skeleton skeleton-text" id="kpiActiveProjects" style="min-width: 50px; display: inline-block;">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg class="icon" width="24" height="24"><use href="#icon-check"></use></svg>
+            </div>
+          </div>
+
+          <!-- 8. إجمالي المشاريع -->
+          <div class="kpi-card kpi-total-proj">
+            <div class="kpi-content">
+              <span class="kpi-label">إجمالي المشاريع</span>
+              <span class="kpi-value skeleton skeleton-text" id="kpiTotalProjects" style="min-width: 50px; display: inline-block;">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- شبكة الرسوم البيانية الوسطى -->
+        <div class="charts-grid">
+          <!-- رسم المصروفات الدائري -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3 class="panel-title">المصروفات حسب النوع</h3>
+            </div>
+            <div class="chart-container" style="flex-direction: row; gap: 10px;">
+              <canvas id="expensesDonutCanvas" width="280" height="220"></canvas>
+              <div id="expensesDonutLegend" style="flex: 1; padding-left: 10px;"></div>
+            </div>
+          </div>
+
+          <!-- رسم الإيرادات والمصروفات خلال 6 أشهر -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3 class="panel-title">الإيرادات والمصروفات خلال 6 أشهر</h3>
+              <div style="display: flex; gap: 12px; font-size: 0.75rem;">
+                <span style="color: var(--accent-green); display: flex; align-items: center; gap: 4px;">● الإيرادات</span>
+                <span style="color: var(--accent-red); display: flex; align-items: center; gap: 4px;">● المصروفات</span>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="monthlyTrendCanvas" width="460" height="220"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- جدول آخر العمليات الحديثة -->
+        <div class="panel-card" style="margin-bottom: 22px;">
+          <div class="panel-header">
+            <h3 class="panel-title">آخر العمليات</h3>
+            <span style="font-size: 0.78rem; color: var(--text-secondary);">الحركات المالية المسجلة مؤخراً</span>
+          </div>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>المبلغ</th>
+                  <th>المشروع</th>
+                  <th>البيان</th>
+                  <th>النوع</th>
+                </tr>
+              </thead>
+              <tbody id="recentOperationsTableBody">
+                <!-- يتم التوليد التلقائي عبر JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- شبكة النماذج واللوحات السريعة الـ 6 المطابقة للتصميم -->
+        <div class="side-quick-grid">
+          <!-- 1. سند قبض (الإيرادات) -->
+          <div class="quick-form-card">
+            <div class="panel-header">
+              <h4 class="panel-title" style="font-size: 0.88rem;">سند قبض (الإيرادات)</h4>
+              <span style="font-size: 0.75rem; color: var(--gold-light);">RC-2024-0001</span>
+            </div>
+            <form id="quickReceiptForm" onsubmit="Accounting.submitReceiptVoucher(event)">
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <label style="margin-bottom: 0;">العميل</label>
+                  <a href="javascript:void(0)" onclick="Accounting.openNewClientModal('rcClientSelect')" style="font-size: 0.75rem; color: var(--gold-light); text-decoration: underline;">+ عميل جديد</a>
+                </div>
+                <select id="rcClientSelect" class="form-control" required>
+                  <option value="">اختر العميل...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <label style="margin-bottom: 0;">الحساب المالي (دليل الحسابات)</label>
+                </div>
+                <select id="rcAccountSelect" class="form-control">
+                  <option value="">اختر الحساب (افتراضي: العملاء 112)...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>مركز التكلفة</label>
+                <select id="rcCostCenterSelect" class="form-control">
+                  <option value="">اختر مركز التكلفة...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <label style="margin-bottom: 0;">المشروع</label>
+                  <a href="javascript:void(0)" onclick="Projects.openNewModal()" style="font-size: 0.75rem; color: var(--gold-light); text-decoration: underline;">+ مشروع جديد</a>
+                </div>
+                <select id="rcProjectSelect" class="form-control">
+                  <option value="">اختر المشروع...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>التاريخ</label>
+                <input type="date" id="rcDate" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>طريقة الدفع</label>
+                <select id="rcPaymentMethod" class="form-control" onchange="Accounting.handlePaymentMethodChange('rcPaymentMethod', 'rcCheckFieldsRow')">
+                  <option value="تحويل بنكي">تحويل بنكي</option>
+                  <option value="نقدي">نقدي</option>
+                  <option value="شيك">شيك</option>
+                </select>
+              </div>
+              <!-- حقول الشيك الشرطية عند اختيار طريقة الدفع بشيك -->
+              <div id="rcCheckFieldsRow" style="display: none; background: rgba(212, 175, 55, 0.08); border: 1px dashed var(--gold-light); padding: 8px; border-radius: 6px; margin-bottom: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="color: var(--gold-light); font-weight: bold; font-size: 0.78rem;">رقم الشيك <span style="color: var(--accent-red);">*</span></label>
+                    <input type="text" id="rcCheckNo" class="form-control" placeholder="أدخل رقم الشيك">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 0.78rem;">البنك المسحوب عليه</label>
+                    <input type="text" id="rcBankName" class="form-control" placeholder="اسم البنك">
+                  </div>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
+                <div class="form-group">
+                  <label>المبلغ</label>
+                  <input type="number" id="rcAmount" class="form-control" placeholder="150000" required>
+                </div>
+                <div class="form-group">
+                  <label>العملة</label>
+                  <select id="rcCurrency" class="form-control">
+                    <option value="ر.ي" selected>ريال يمني (ر.ي)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                    <option value="$">دولار ($)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>ملاحظات</label>
+                <input type="text" id="rcNotes" class="form-control" placeholder="دفعة أولى من المستخلص">
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button type="submit" class="btn btn-primary btn-sm" style="flex: 1;">حفظ</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="Accounting.resetReceiptForm()">جديد</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- 2. سند صرف (المصروفات) -->
+          <div class="quick-form-card">
+            <div class="panel-header">
+              <h4 class="panel-title" style="font-size: 0.88rem;">سند صرف (المصروفات)</h4>
+              <span style="font-size: 0.75rem; color: var(--accent-red);">EP-2024-0001</span>
+            </div>
+            <form id="quickExpenseForm" onsubmit="Accounting.submitExpenseVoucher(event)">
+              <div class="form-group">
+                <label>نوع المصروف</label>
+                <select id="expTypeSelect" class="form-control" required>
+                  <option value="مواد بناء">مواد بناء</option>
+                  <option value="أجور عمالة">أجور عمالة</option>
+                  <option value="معدات">معدات</option>
+                  <option value="نقل ومواصلات">نقل ومواصلات</option>
+                  <option value="مصروفات إدارية">مصروفات إدارية</option>
+                  <option value="أخرى">أخرى</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>الحساب المالي (دليل الحسابات)</label>
+                <select id="expAccountSelect" class="form-control">
+                  <option value="">اختر الحساب (تلقائي: تكاليف ومصروفات 5)...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>مركز التكلفة</label>
+                <select id="expCostCenterSelect" class="form-control">
+                  <option value="">اختر مركز التكلفة...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <label style="margin-bottom: 0;">المشروع</label>
+                  <a href="javascript:void(0)" onclick="Projects.openNewModal()" style="font-size: 0.75rem; color: var(--gold-light); text-decoration: underline;">+ مشروع جديد</a>
+                </div>
+                <select id="expProjectSelect" class="form-control">
+                  <option value="">اختر المشروع...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <label style="margin-bottom: 0;">المورد (اختياري)</label>
+                  <a href="javascript:void(0)" onclick="Accounting.openNewSupplierModal('expSupplierSelect')" style="font-size: 0.75rem; color: var(--accent-red); text-decoration: underline;">+ مورد جديد</a>
+                </div>
+                <select id="expSupplierSelect" class="form-control">
+                  <option value="">اختر المورد...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>التاريخ</label>
+                <input type="date" id="expDate" class="form-control" required>
+              </div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
+                <div class="form-group">
+                  <label>المبلغ</label>
+                  <input type="number" id="expAmount" class="form-control" placeholder="45000" required>
+                </div>
+                <div class="form-group">
+                  <label>العملة</label>
+                  <select id="expCurrency" class="form-control">
+                    <option value="ر.ي" selected>ريال يمني (ر.ي)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                    <option value="$">دولار ($)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>طريقة الدفع</label>
+                <select id="expPaymentMethod" class="form-control" onchange="Accounting.handlePaymentMethodChange('expPaymentMethod', 'expCheckFieldsRow')">
+                  <option value="نقدي">نقدي</option>
+                  <option value="تحويل بنكي">تحويل بنكي</option>
+                  <option value="شيك">شيك</option>
+                </select>
+              </div>
+              <!-- حقول الشيك الشرطية عند اختيار طريقة الدفع بشيك -->
+              <div id="expCheckFieldsRow" style="display: none; background: rgba(239, 68, 68, 0.08); border: 1px dashed var(--accent-red); padding: 8px; border-radius: 6px; margin-bottom: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="color: var(--accent-red); font-weight: bold; font-size: 0.78rem;">رقم الشيك <span style="color: var(--accent-red);">*</span></label>
+                    <input type="text" id="expCheckNo" class="form-control" placeholder="أدخل رقم الشيك">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 0.78rem;">البنك المسحوب عليه</label>
+                    <input type="text" id="expBankName" class="form-control" placeholder="اسم البنك">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>ملاحظات</label>
+                <input type="text" id="expNotes" class="form-control" placeholder="شراء إسمنت وحديد">
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button type="submit" class="btn btn-primary btn-sm" style="flex: 1;">حفظ</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="Accounting.resetExpenseForm()">إلغاء</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- 3. النثريات والعهد -->
+          <div class="quick-form-card">
+            <div class="panel-header">
+              <h4 class="panel-title" style="font-size: 0.88rem;">النثريات والعهد</h4>
+            </div>
+            <form id="quickCustodyForm" onsubmit="Accounting.submitCustody(event)">
+              <div class="form-group">
+                <label>نوع العملية</label>
+                <select id="custodyTypeSelect" class="form-control" onchange="Accounting.handleCustodyTypeChange('custodyTypeSelect', 'quickCustodyRelatedRow')">
+                  <option value="صرف عهدة">صرف عهدة جديدة</option>
+                  <option value="تصفية عهدة">تصفية عهدة سابقة</option>
+                  <option value="نثريات">نثريات ومصروفات يومية</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>الموظف المرتبط بالعهدة <span style="color: var(--accent-red);">*</span></label>
+                <select id="custodyEmployeeSelect" class="form-control" required onchange="Accounting.onCustodyEmployeeChange('custodyEmployeeSelect', 'custodyRelatedSelect')">
+                  <option value="">اختر الموظف...</option>
+                </select>
+              </div>
+              <!-- حقل اختيار رقم العهدة المراد تصفيتها شرطياً -->
+              <div class="form-group" id="quickCustodyRelatedRow" style="display: none; background: rgba(59, 130, 246, 0.08); border: 1px dashed #3b82f6; padding: 8px; border-radius: 6px; margin-bottom: 10px;">
+                <label style="color: #60a5fa; font-weight: bold; font-size: 0.8rem;">العهدة الأصلية المراد تصفيتها <span style="color: var(--accent-red);">*</span></label>
+                <select id="custodyRelatedSelect" class="form-control" onchange="Accounting.onRelatedCustodySelect('custodyRelatedSelect', 'custodyTotalAmount', 'custodySpentAmount')">
+                  <option value="">اختر العهدة المفتوحة للتصفية...</option>
+                </select>
+              </div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
+                <div class="form-group">
+                  <label id="quickCustodyAmountLabel">إجمالي العهدة</label>
+                  <input type="number" id="custodyTotalAmount" class="form-control" placeholder="10000" required>
+                </div>
+                <div class="form-group">
+                  <label>العملة</label>
+                  <select id="custodyCurrency" class="form-control">
+                    <option value="ر.ي" selected>ريال يمني (ر.ي)</option>
+                    <option value="ر.س">ريال سعودي (ر.س)</option>
+                    <option value="$">دولار ($)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" id="quickCustodySpentGroup">
+                <label id="quickCustodySpentLabel">المصروف منها</label>
+                <input type="number" id="custodySpentAmount" class="form-control" value="0">
+              </div>
+              <div class="form-group">
+                <label>التاريخ</label>
+                <input type="date" id="custodyDate" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>ملاحظات</label>
+                <input type="text" id="custodyNotes" class="form-control" placeholder="قرطاسية ومصروفات مكتبية">
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 6px;">حفظ العملية</button>
+            </form>
+          </div>
+
+          <!-- 4. الصندوق والبنك -->
+          <div class="quick-form-card">
+            <div class="panel-header">
+              <h4 class="panel-title" style="font-size: 0.88rem;">الصندوق والبنك</h4>
+              <span style="font-size: 0.75rem; color: var(--gold-light);">حركة الصندوق</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.84rem; margin-top: 6px;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-light); padding-bottom: 6px;">
+                <span>الرصيد السابق</span>
+                <strong id="cashPrevBalance">50,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-light); padding-bottom: 6px;">
+                <span>إيرادات نقدية</span>
+                <strong id="cashIncome" style="color: var(--accent-green);">25,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-light); padding-bottom: 6px;">
+                <span>مصروفات نقدية</span>
+                <strong id="cashExpense" style="color: var(--accent-red);">15,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-light); padding-bottom: 6px;">
+                <span>السحوبات</span>
+                <strong id="cashWithdrawal">5,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(56, 189, 248, 0.2);">
+                <span style="font-weight: 700; color: var(--accent-blue);">الرصيد الحالي</span>
+                <strong id="cashCurBalance" style="font-size: 1.1rem; color: #fff;">55,000</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. تقرير الأرباح والخسائر -->
+          <div class="quick-form-card">
+            <div class="panel-header">
+              <h4 class="panel-title" style="font-size: 0.88rem;">تقرير الأرباح والخسائر</h4>
+            </div>
+            <div class="form-group">
+              <label>من تاريخ</label>
+              <input type="date" id="plFromDate" class="form-control" value="2024-01-01">
+            </div>
+            <div class="form-group">
+              <label>إلى تاريخ</label>
+              <input type="date" id="plToDate" class="form-control" value="2024-05-20">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin: 12px 0; font-size: 0.82rem;">
+              <div style="display: flex; justify-content: space-between;">
+                <span>إجمالي الدخل:</span>
+                <strong id="plTotalIncome" style="color: var(--accent-green);">1,250,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>إجمالي المصروفات:</span>
+                <strong id="plTotalExpenses" style="color: var(--accent-red);">850,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-light); padding-top: 6px;">
+                <span>صافي الأرباح:</span>
+                <strong id="plNetProfit" style="color: var(--gold-light); font-size: 0.95rem;">400,000</strong>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="Reports.filterProfitLoss()">عرض التقرير</button>
+              <button class="btn btn-secondary btn-sm" onclick="Reports.exportProfitLossToExcel()">تصدير Excel</button>
+            </div>
+          </div>
+
+          <!-- 6. كشف حساب عميل -->
+          <div class="quick-form-card">
+            <div class="panel-header">
+              <h4 class="panel-title" style="font-size: 0.88rem;">كشف حساب عميل</h4>
+            </div>
+            <div class="form-group">
+              <label>العميل</label>
+              <select id="statementClientSelect" class="form-control" onchange="Reports.loadClientStatement()">
+                <option value="">اختر العميل...</option>
+              </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin: 10px 0; font-size: 0.82rem;">
+              <div style="display: flex; justify-content: space-between;">
+                <span>الرصيد السابق:</span>
+                <strong id="csPrevBalance">120,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>إجمالي المدفوعات:</span>
+                <strong id="csTotalPaid" style="color: var(--accent-green);">550,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>إجمالي المستحقات:</span>
+                <strong id="csTotalDue" style="color: var(--accent-red);">320,000</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-light); padding-top: 6px;">
+                <span>الرصيد الحالي:</span>
+                <strong id="csCurBalance" style="color: var(--gold-light); font-size: 0.95rem;">190,000</strong>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="Reports.loadClientStatement()">عرض التفاصيل</button>
+          </div>
+        </div>
+
+        <!-- جدول المشاريع الرئيسي السفلي -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3 class="panel-title">المشاريع</h3>
+            <button class="btn btn-primary btn-sm" onclick="Projects.openNewModal()">
+              <svg class="icon" width="14" height="14"><use href="#icon-plus"></use></svg>
+              <span>مشروع جديد +</span>
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>اسم المشروع</th>
+                  <th>العميل</th>
+                  <th>قيمة العقد</th>
+                  <th>القيمة التقديرية</th>
+                  <th>التكلفة الفعلية</th>
+                  <th>نسبة الإنجاز</th>
+                  <th>الربح المتوقع</th>
+                  <th>الربح الفعلي</th>
+                  <th>الإجراء</th>
+                </tr>
+              </thead>
+              <tbody id="projectsTableBody">
+                <!-- يتم تعبئة المشاريع تلقائياً عبر JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>

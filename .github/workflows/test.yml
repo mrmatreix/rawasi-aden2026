@@ -1,0 +1,25 @@
+name: test-suite
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      # البناء الحتمي (يتحقق من بصمة الإصدار)
+      - run: npm run build
+      # البذرة + الترحيل (مرتين للتحقق من عدم التكرار) قبل الفحص الكامل
+      - run: npm run seed
+      - run: npm run migrate
+      - run: npm run migrate
+      # الفحص الكامل: تكامل + وحدة (96 اختباراً) على قاعدة مبذورة ومرحّلة
+      - run: npm test

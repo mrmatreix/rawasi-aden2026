@@ -1,0 +1,44 @@
+{
+  "name": "rawasi-aden-system",
+  "version": "1.0.0",
+  "description": "النظام المحاسبي والإداري المتكامل - شركة رواسي عدن للهندسة والمقاولات",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "start:staging": "node scripts/run_staging.js",
+    "build": "node build_www.js",
+    "dev": "node server/server.js",
+    "test": "node --test --test-concurrency=1 tests/**/*.test.js",
+    "test:flow": "node tests/test_material_flow.js",
+    "test:contracts": "node tests/test_cash_flow_and_contract_lifecycle.js",
+    "test:material": "node --test --test-concurrency=1 tests/integration/material_management_ddd.test.js",
+    "test:unit": "node --test --test-concurrency=1 tests/unit/**/*.test.js",
+    "test:integration": "node --test --test-concurrency=1 tests/integration/**/*.test.js",
+    "seed": "node server/database/seed.js",
+    "seed:coa": "node seed_chart_of_accounts.js",
+    "validate:coa": "node validate_coa.js",
+    "clean:prod": "node scripts/clean_production_database.js"
+  },
+  "keywords": [
+    "rawasi-aden",
+    "contracting",
+    "accounting",
+    "erp",
+    "yemen",
+    "engineering"
+  ],
+  "author": "رواسي عدن للهندسة والمقاولات",
+  "license": "ISC",
+  "dependencies": {
+    "adm-zip": "^0.6.1",
+    "archiver": "^8.0.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "docx": "^9.7.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.24.4",
+    "pdf-lib": "^1.17.1",
+    "xlsx": "^0.18.5"
+  }
+}

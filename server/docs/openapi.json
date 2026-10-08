@@ -1,0 +1,215 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "نظام رواسي عدن للهندسة والمقاولات - واجهة برمجة التطبيقات (API)",
+    "description": "المواصفة الرسمية الشاملة لخدمات وواجهات برمجة التطبيقات للنظام المحاسبي والإداري المتكامل لشركة رواسي عدن.",
+    "version": "5.3.0",
+    "contact": {
+      "name": "الدعم الفني والتقني - رواسي عدن",
+      "email": "support@rawasi-aden.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5500",
+      "description": "بيئة التطوير والإنتاج المحلي (Local/Production)"
+    },
+    {
+      "url": "http://localhost:5501",
+      "description": "بيئة الاختبار والتجربة المعزولة (Staging Environment)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "توكن المصادقة المشفر JWT يتم إرساله في ترويسة Authorization: Bearer <token>"
+      },
+      "CsrfToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-csrf-token",
+        "description": "رمز الحماية من تزوير الطلبات عبر المواقع CSRF"
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "data": { "type": "object" }
+        }
+      },
+      "JournalEntry": {
+        "type": "object",
+        "required": ["date", "description", "lines"],
+        "properties": {
+          "date": { "type": "string", "format": "date", "example": "2026-09-22" },
+          "description": { "type": "string", "example": "صرف مستحقات مقاول باطن مشروع البريقة" },
+          "reference_type": { "type": "string", "example": "قيد يدوي" },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["account_id"],
+              "properties": {
+                "account_id": { "type": "integer", "example": 14 },
+                "cost_center_id": { "type": "integer", "example": 2 },
+                "debit": { "type": "number", "example": 150000 },
+                "credit": { "type": "number", "example": 0 },
+                "description": { "type": "string", "example": "تكلفة أعمال الخرسانة" }
+              }
+            }
+          }
+        }
+      },
+      "PeriodCloseRequest": {
+        "type": "object",
+        "required": ["manager_password"],
+        "properties": {
+          "manager_password": { "type": "string", "format": "password", "example": "admin123" },
+          "notes": { "type": "string", "example": "إقفال نهاية الربع المالي الثالث بعد مطابقة البنك" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "فحص حالة الخادم والنظام",
+        "tags": ["System"],
+        "responses": {
+          "200": { "description": "الخادم يعمل بنجاح وبحالة جيدة" }
+        }
+      }
+    },
+    "/api/version": {
+      "get": {
+        "summary": "معلومات الإصدار والبيئة التشغيلية",
+        "tags": ["System"],
+        "responses": {
+          "200": { "description": "معلومات الإصدار والبيئة والمنافذ" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "تسجيل الدخول والحصول على رمز JWT و CSRF",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": { "type": "string", "example": "admin" },
+                  "password": { "type": "string", "format": "password", "example": "admin123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "تم تسجيل الدخول بنجاح" },
+          "401": { "description": "بيانات الدخول غير صحيحة" },
+          "429": { "description": "تم حظر الدخول مؤقتاً بسبب تكرار المحاولات" }
+        }
+      }
+    },
+    "/api/accounting/journal-entries": {
+      "get": {
+        "summary": "استعراض قيود اليومية العامة مع التصفية",
+        "tags": ["Accounting"],
+        "security": [{ "BearerAuth": [] }, { "CsrfToken": [] }],
+        "parameters": [
+          { "name": "from_date", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "to_date", "in": "query", "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": { "200": { "description": "قائمة القيود" } }
+      },
+      "post": {
+        "summary": "إنشاء قيد يومية متزن مع التحقق من الفترات ومراكز التكلفة",
+        "tags": ["Accounting"],
+        "security": [{ "BearerAuth": [] }, { "CsrfToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/JournalEntry" } } }
+        },
+        "responses": {
+          "200": { "description": "تم حفظ القيد المتزن بنجاح" },
+          "400": { "description": "القيد غير متزن أو ناقص مركز التكلفة لحساب اسمي" },
+          "403": { "description": "التاريخ يقع ضمن فترة محاسبية مغلقة" }
+        }
+      }
+    },
+    "/api/accounting/check-period": {
+      "get": {
+        "summary": "فحص هل تاريخ معين يقع داخل فترة محاسبية مغلقة",
+        "tags": ["Accounting"],
+        "parameters": [
+          { "name": "date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": { "200": { "description": "حالة الفترة: مفتوحة أو مغلقة" } }
+      }
+    },
+    "/api/accounting/periods/{id}/close": {
+      "put": {
+        "summary": "إقفال فترة محاسبية رسمياً بواسطة كلمة مرور المدير",
+        "tags": ["Accounting"],
+        "security": [{ "BearerAuth": [] }, { "CsrfToken": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PeriodCloseRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "تم إقفال الفترة بنجاح" },
+          "401": { "description": "كلمة مرور المدير غير صحيحة" }
+        }
+      }
+    },
+    "/api/accounting/audit-logs": {
+      "get": {
+        "summary": "سجل التدقيق والرقابة المالية والإدارية (Audit Trail)",
+        "tags": ["Audit"],
+        "security": [{ "BearerAuth": [] }, { "CsrfToken": [] }],
+        "parameters": [
+          { "name": "action", "in": "query", "schema": { "type": "string" } },
+          { "name": "entity_type", "in": "query", "schema": { "type": "string" } },
+          { "name": "username", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "سجلات التدقيق" } }
+      }
+    },
+    "/api/hr/payroll/{month}/preview-journal": {
+      "get": {
+        "summary": "معاينة القيد المركب المتزن لمسير الرواتب (تأمينات 6% و 9% وضرائب)",
+        "tags": ["HR & Payroll"],
+        "security": [{ "BearerAuth": [] }, { "CsrfToken": [] }],
+        "parameters": [
+          { "name": "month", "in": "path", "required": true, "schema": { "type": "string", "example": "2026-09" } }
+        ],
+        "responses": { "200": { "description": "تفاصيل القيد وأطراف المدين والدائن المتزنة" } }
+      }
+    },
+    "/api/reports/cost-centers-profitability": {
+      "get": {
+        "summary": "تقرير أداء وربحية مراكز التكلفة والمشاريع",
+        "tags": ["Reports"],
+        "security": [{ "BearerAuth": [] }, { "CsrfToken": [] }],
+        "parameters": [
+          { "name": "from_date", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "to_date", "in": "query", "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": { "200": { "description": "إيرادات ومصروفات وصافي ربح المراكز" } }
+      }
+    }
+  }
+}

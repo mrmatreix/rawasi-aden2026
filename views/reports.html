@@ -1,0 +1,543 @@
+<section id="reportsView" class="app-view-section" style="display: none;">
+  <div class="page-header-row">
+    <div>
+      <h2 class="page-title">مركز التقارير والقوائم المالية الرسمية</h2>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
+        جميع الأرقام مستخرجة ومطابقة 100% من دفتر الأستاذ العام (General Ledger) والحسابات الفرعية الأخيرة (Leaf Accounts)
+      </p>
+    </div>
+    <div class="page-actions" style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary" onclick="Reports.printActiveReport()">
+        <svg class="icon" width="16" height="16"><use href="#icon-print"></use></svg>
+        <span>طباعة التقرير (PDF)</span>
+      </button>
+      <button class="btn btn-primary" onclick="Reports.exportActiveReportToExcel()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        <span>تصدير إلى Excel</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- شريط تبويبات التقارير -->
+  <div class="report-tabs-bar">
+    <button class="report-tab-btn active" id="tabBtn_profit-loss" onclick="Reports.switchReportTab('profit-loss')">قائمة الأرباح والخسائر</button>
+    <button class="report-tab-btn" id="tabBtn_trial-balance" onclick="Reports.switchReportTab('trial-balance')">ميزان المراجعة والأرصدة</button>
+    <button class="report-tab-btn" id="tabBtn_income-statement" onclick="Reports.switchReportTab('income-statement')">قائمة الدخل المعيارية</button>
+    <button class="report-tab-btn" id="tabBtn_balance-sheet" onclick="Reports.switchReportTab('balance-sheet')">الميزانية العمومية والمركز المالي</button>
+    <button class="report-tab-btn" id="tabBtn_cash-flow" onclick="Reports.switchReportTab('cash-flow')">قائمة التدفقات النقدية</button>
+    <button class="report-tab-btn" id="tabBtn_projects-profitability" onclick="Reports.switchReportTab('projects-profitability')">ربحية المشاريع</button>
+    <button class="report-tab-btn" id="tabBtn_cost-centers-profitability" onclick="Reports.switchReportTab('cost-centers-profitability')">ربحية مراكز التكلفة</button>
+    <button class="report-tab-btn" id="tabBtn_client-statement" onclick="Reports.switchReportTab('client-statement')">كشف حساب عميل</button>
+    <button class="report-tab-btn" id="tabBtn_supplier-statement" onclick="Reports.switchReportTab('supplier-statement')">كشف حساب مورد</button>
+  </div>
+
+  <!-- ================== تبويب 1: قائمة الأرباح والخسائر ================== -->
+  <div id="pane_profit-loss" class="report-pane">
+    <div class="panel-card" style="margin-bottom: 20px;">
+      <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px;">
+        <div class="form-group" style="margin: 0;">
+          <label>من تاريخ</label>
+          <input type="date" id="repPlFromDate" class="form-control" value="2024-01-01">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>إلى تاريخ</label>
+          <input type="date" id="repPlToDate" class="form-control">
+        </div>
+        <button class="btn btn-primary" onclick="Reports.loadFullProfitLoss()">
+          <span>تحديث التقرير</span>
+        </button>
+        <span id="plReconcileBadge" class="badge badge-success" style="padding: 6px 12px; font-size: 0.8rem; margin-right: auto;">
+          ✓ مطابق مع الأستاذ العام
+        </span>
+      </div>
+
+      <!-- بطاقات ملخص الدخل -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">إجمالي الإيرادات المعترف بها:</span>
+          <h3 id="fullPlIncome" style="color: var(--accent-green); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">إجمالي التكاليف والمصروفات:</span>
+          <h3 id="fullPlExpense" style="color: var(--accent-red); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">صافي الأرباح التشغيلية:</span>
+          <h3 id="fullPlProfit" style="color: var(--gold-light); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+      </div>
+
+      <h4 style="margin-bottom: 12px; color: #fff;">تفصيل المصروفات وتكاليف المشاريع:</h4>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>نوع المصروف</th>
+              <th>إجمالي المبلغ</th>
+              <th>النسبة من إجمالي المصروفات</th>
+            </tr>
+          </thead>
+          <tbody id="fullPlBreakdownTable">
+            <tr><td colspan="3" style="text-align: center; color: var(--text-secondary); padding: 16px;">جاري تحميل بيانات الأرباح والخسائر...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== تبويب 2: تقرير ميزان المراجعة والأرصدة ================== -->
+  <div id="pane_trial-balance" class="report-pane" style="display: none;">
+    <div class="panel-card" style="margin-bottom: 20px;">
+      <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px;">
+        <div class="form-group" style="margin: 0;">
+          <label>من تاريخ</label>
+          <input type="date" id="tbFromDate" class="form-control" value="2024-01-01">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>إلى تاريخ</label>
+          <input type="date" id="tbToDate" class="form-control">
+        </div>
+        <button class="btn btn-primary" onclick="Reports.loadTrialBalance()">تحديث ميزان المراجعة</button>
+      </div>
+
+      <!-- بطاقات ملخص توازن ميزان المراجعة -->
+      <div class="kpi-grid" style="margin-bottom: 20px;">
+        <div class="kpi-card kpi-income">
+          <div class="kpi-content">
+            <span class="kpi-label">إجمالي الحركات المدينة (منه)</span>
+            <span class="kpi-value" id="tbTotalDebit">0 ر.ي</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-expense">
+          <div class="kpi-content">
+            <span class="kpi-label">إجمالي الحركات الدائنة (له)</span>
+            <span class="kpi-value" id="tbTotalCredit">0 ر.ي</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-total-proj">
+          <div class="kpi-content">
+            <span class="kpi-label">مجموع الأرصدة المدينة الختامية</span>
+            <span class="kpi-value" id="tbBalanceDebit">0 ر.ي</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-cash">
+          <div class="kpi-content">
+            <span class="kpi-label">حالة التوازن المحاسبي</span>
+            <span class="kpi-value" id="tbBalanceStatus" style="color: var(--accent-green); font-size: 1.15rem;">متزن 100%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th rowspan="2" style="vertical-align: middle;">رقم الحساب</th>
+              <th rowspan="2" style="vertical-align: middle;">اسم الحساب المالي (الفرعي الأخير)</th>
+              <th rowspan="2" style="vertical-align: middle;">التصنيف</th>
+              <th colspan="2" style="text-align: center; background: rgba(148,163,184,0.1);">الرصيد الافتتاحي</th>
+              <th colspan="2" style="text-align: center; background: rgba(56,189,248,0.1);">حركات الفترة</th>
+              <th colspan="2" style="text-align: center; background: rgba(16,185,129,0.1);">الأرصدة الختامية</th>
+            </tr>
+            <tr>
+              <th style="background: rgba(148,163,184,0.06);">مدين</th>
+              <th style="background: rgba(148,163,184,0.06);">دائن</th>
+              <th style="background: rgba(56,189,248,0.06);">مدين (منه)</th>
+              <th style="background: rgba(56,189,248,0.06);">دائن (له)</th>
+              <th style="background: rgba(16,185,129,0.06);">رصيد مدين</th>
+              <th style="background: rgba(16,185,129,0.06);">رصيد دائن</th>
+            </tr>
+          </thead>
+          <tbody id="trialBalanceTableBody">
+            <tr><td colspan="9" style="text-align: center; padding: 20px;">جاري تحميل ميزان المراجعة...</td></tr>
+          </tbody>
+          <tfoot id="trialBalanceTableFoot" style="font-weight: bold; background: rgba(255,255,255,0.04);"></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== تبويب 3: تقرير قائمة الدخل المعيارية ================== -->
+  <div id="pane_income-statement" class="report-pane" style="display: none;">
+    <div class="panel-card" style="margin-bottom: 20px;">
+      <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px;">
+        <div class="form-group" style="margin: 0;">
+          <label>من تاريخ</label>
+          <input type="date" id="isFromDate" class="form-control" value="2024-01-01">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>إلى تاريخ</label>
+          <input type="date" id="isToDate" class="form-control">
+        </div>
+        <button class="btn btn-primary" onclick="Reports.loadIncomeStatement()">تحديث قائمة الدخل</button>
+      </div>
+
+      <!-- بطاقات مؤشرات تقرير الدخل المعيارية -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">4. إجمالي الإيرادات المعترف بها:</span>
+          <h3 id="isTotalRevenues" style="color: var(--accent-green); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">51. تكلفة الإيراد المباشرة:</span>
+          <h3 id="isDirectCosts" style="color: #38bdf8; margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(234,179,8,0.12); border: 1px solid rgba(234,179,8,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">مجمل الربح (الإيرادات - التكلفة المباشرة):</span>
+          <h3 id="isGrossProfit" style="color: #facc15; margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">3. المصروفات التشغيلية والإدارية:</span>
+          <h3 id="isTotalExpenses" style="color: var(--accent-red); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">صافي الدخل النهائي:</span>
+          <h3 id="isNetIncome" style="color: var(--gold-light); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <h4 style="color: var(--accent-green); margin-bottom: 10px;">(4) حسابات الإيرادات وإثبات الـ POC</h4>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead><tr><th>بند الإيراد</th><th>المبلغ المحقق</th></tr></thead>
+              <tbody id="isRevenuesTableBody">
+                <tr><td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 14px;">لا توجد بيانات</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h4 style="color: var(--accent-red); margin-bottom: 10px;">(3/5) حسابات التكاليف والمصروفات</h4>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead><tr><th>بند المصروف / التكلفة</th><th>المبلغ المنصرف</th></tr></thead>
+              <tbody id="isExpensesTableBody">
+                <tr><td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 14px;">لا توجد بيانات</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== تبويب 4: الميزانية العمومية والمركز المالي ================== -->
+  <div id="pane_balance-sheet" class="report-pane" style="display: none;">
+    <div class="panel-card" style="margin-bottom: 20px;">
+      <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px;">
+        <div class="form-group" style="margin: 0;">
+          <label>حتى تاريخ (As of Date)</label>
+          <input type="date" id="bsAsOfDate" class="form-control">
+        </div>
+        <button class="btn btn-primary" onclick="Reports.loadBalanceSheet()">تحديث المركز المالي</button>
+        <span id="bsReconcileBadge" class="badge" style="padding: 6px 12px; font-size: 0.85rem; margin-right: auto; background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3);">
+          ⚖️ معادلة الميزانية: متزنة تماماً (Assets = Liabilities + Equity)
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="panel-card" style="margin: 0; background: rgba(15,23,42,0.6);">
+          <h4 style="color: var(--accent-blue); margin-bottom: 12px; display: flex; justify-content: space-between;">
+            <span>الأصول والموجودات (1 - Assets)</span>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">أرصدة مدينة</span>
+          </h4>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead><tr><th>الحساب الفرعي الأخير</th><th style="text-align: left;">الرصيد القائم</th></tr></thead>
+              <tbody id="bsAssetsTable">
+                <tr><td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 14px;">جاري تحميل الأصول...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+            <strong>إجمالي الأصول:</strong>
+            <strong id="bsTotalAssets" style="color: var(--accent-blue);">0 ر.ي</strong>
+          </div>
+        </div>
+
+        <div class="panel-card" style="margin: 0; background: rgba(15,23,42,0.6);">
+          <h4 style="color: var(--accent-amber); margin-bottom: 12px; display: flex; justify-content: space-between;">
+            <span>الالتزامات وحقوق الملكية (2 - Liabilities & Equity)</span>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">أرصدة دائنة</span>
+          </h4>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead><tr><th>الحساب الفرعي الأخير</th><th style="text-align: left;">الرصيد القائم</th></tr></thead>
+              <tbody id="bsLiabTable">
+                <tr><td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 14px;">جاري تحميل الالتزامات والملكية...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+            <strong>إجمالي الخصوم وحقوق الملكية:</strong>
+            <strong id="bsTotalLiabEquity" style="color: var(--accent-amber);">0 ر.ي</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== تبويب 5: التدفقات النقدية ================== -->
+  <div id="pane_cash-flow" class="report-pane" style="display: none;">
+    <div class="panel-card" style="margin-bottom: 20px;">
+      <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px;">
+        <div class="form-group" style="margin: 0;">
+          <label>من تاريخ</label>
+          <input type="date" id="cfFromDate" class="form-control" value="2024-01-01">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>إلى تاريخ</label>
+          <input type="date" id="cfToDate" class="form-control">
+        </div>
+        <button class="btn btn-primary" onclick="Reports.loadCashFlow()">تحديث التدفقات النقدية</button>
+        <span id="cfReconcileBadge" class="badge" style="padding: 6px 12px; font-size: 0.85rem; margin-right: auto; background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3);">
+          ✓ مطابق مع أرصدة النقدية والبنوك في الأستاذ العام
+        </span>
+      </div>
+
+      <!-- بطاقات ملخص التدفقات النقدية -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        <div style="background: rgba(148,163,184,0.12); border: 1px solid rgba(148,163,184,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">النقدية أول المدة:</span>
+          <h3 id="cfOpeningCash" style="color: #cbd5e1; margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">صافي التدفقات التشغيلية:</span>
+          <h3 id="cfNetOperating" style="color: var(--accent-green); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">صافي التغير في النقدية:</span>
+          <h3 id="cfNetChange" style="color: var(--accent-blue); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">النقدية في نهاية المدة:</span>
+          <h3 id="cfClosingCash" style="color: var(--gold-light); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+      </div>
+
+      <!-- جداول التدفقات التشغيلية والاستثمارية والتمويلية -->
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>بيان التدفق النقدي</th>
+              <th>مقبوضات نقدية (+)</th>
+              <th>مدفوعات نقدية (-)</th>
+              <th>الصافي</th>
+            </tr>
+          </thead>
+          <tbody id="cashFlowTableBody">
+            <tr><td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 16px;">جاري تحميل التدفقات النقدية...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== تبويب 6: ربحية المشاريع ================== -->
+  <div id="pane_projects-profitability" class="report-pane" style="display: none;">
+    <div class="panel-card">
+      <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px;">
+        <div class="form-group" style="margin: 0;">
+          <label>من تاريخ</label>
+          <input type="date" id="repProjFromDate" class="form-control">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>إلى تاريخ</label>
+          <input type="date" id="repProjToDate" class="form-control">
+        </div>
+        <div class="form-group" style="margin: 0; min-width: 220px;">
+          <label>المشروع</label>
+          <select id="repProjFilterSelect" class="form-control">
+            <option value="">كافة المشاريع</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="Reports.loadProjectsProfitability()">تحديث ربحية المشاريع</button>
+      </div>
+
+      <h4 style="margin-bottom: 12px; color: #fff;">تحليل أرباح وتكاليف المشاريع المعترف بها محاسبياً:</h4>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>اسم المشروع وكوده</th>
+              <th>العميل</th>
+              <th>قيمة العقد</th>
+              <th>التكلفة الفعلية للأستاذ</th>
+              <th>الإيراد المعترف به</th>
+              <th>صافي الربح الفعلي</th>
+              <th>هامش الربح %</th>
+              <th>نسبة الإنجاز POC</th>
+            </tr>
+          </thead>
+          <tbody id="projProfitTableBody">
+            <tr><td colspan="8" style="text-align: center; color: var(--text-secondary); padding: 16px;">جاري تحميل ربحية المشاريع...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== تبويب 7: ربحية مراكز التكلفة ================== -->
+  <div id="pane_cost-centers-profitability" class="report-pane" style="display: none;">
+    <div class="panel-card" style="margin-bottom: 20px;">
+      <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px;">
+        <div class="form-group" style="margin: 0;">
+          <label>من تاريخ</label>
+          <input type="date" id="repCcFromDate" class="form-control">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>إلى تاريخ</label>
+          <input type="date" id="repCcToDate" class="form-control">
+        </div>
+        <div class="form-group" style="margin: 0; min-width: 220px;">
+          <label>مركز التكلفة</label>
+          <select id="repCcFilterSelect" class="form-control">
+            <option value="">كافة مراكز التكلفة</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="Reports.loadCostCentersProfitability()">
+          <span>تحديث ربحية المراكز</span>
+        </button>
+      </div>
+
+      <!-- بطاقات مؤشرات ربحية مراكز التكلفة -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">إجمالي إيرادات المراكز:</span>
+          <h3 id="ccProfitTotalRev" style="color: var(--accent-green); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">إجمالي تكاليف ومصروفات المراكز:</span>
+          <h3 id="ccProfitTotalExp" style="color: var(--accent-red); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">صافي الربح / الفائض:</span>
+          <h3 id="ccProfitTotalNet" style="color: var(--gold-light); margin-top: 4px;">0 ر.ي</h3>
+        </div>
+        <div style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); padding: 14px; border-radius: var(--radius-md);">
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">متوسط هامش الربحية:</span>
+          <h3 id="ccProfitTotalMargin" style="color: #38bdf8; margin-top: 4px;">0%</h3>
+        </div>
+      </div>
+
+      <h4 style="margin-bottom: 12px; color: #fff;">تفاصيل أداء وربحية مراكز التكلفة والمشاريع:</h4>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>كود المركز</th>
+              <th>اسم مركز التكلفة</th>
+              <th>النوع</th>
+              <th>المشروع المرتبط</th>
+              <th>إجمالي الإيرادات</th>
+              <th>إجمالي المصروفات</th>
+              <th>صافي الربح / الفائض</th>
+              <th>الحالة ومعدل الربحية</th>
+            </tr>
+          </thead>
+          <tbody id="ccProfitTableBody">
+            <tr><td colspan="8" style="text-align: center; color: var(--text-secondary); padding: 16px;">جاري تحميل بيانات مراكز التكلفة...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== تبويب 8: كشف حساب عميل مفصل ================== -->
+  <div id="pane_client-statement" class="report-pane" style="display: none;">
+    <div class="panel-card">
+      <div style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 14px; flex-wrap: wrap;">
+        <div class="form-group" style="margin: 0; min-width: 250px;">
+          <label>اختر العميل</label>
+          <select id="repClientSelect" class="form-control" onchange="Reports.fetchFullClientStatement()">
+            <option value="">اختر العميل...</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>من تاريخ</label>
+          <input type="date" id="repClientFromDate" class="form-control">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>إلى تاريخ</label>
+          <input type="date" id="repClientToDate" class="form-control">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="Reports.fetchFullClientStatement()">عرض الكشف</button>
+      </div>
+
+      <div id="repClientInfo"></div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>نوع الحركة</th>
+              <th>المرجع / السند</th>
+              <th>المشروع / العقد</th>
+              <th>مدين (عقد/مستخلص)</th>
+              <th>دائن (سداد/قبض)</th>
+              <th>الرصيد المستحق</th>
+              <th>البيان والملاحظات</th>
+            </tr>
+          </thead>
+          <tbody id="repClientStatementTable">
+            <tr><td colspan="8" style="text-align: center; padding: 25px; color: var(--text-secondary);">يرجى اختيار عميل لعرض كشف الحساب</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== تبويب 9: كشف حساب مورد مفصل ================== -->
+  <div id="pane_supplier-statement" class="report-pane" style="display: none;">
+    <div class="panel-card">
+      <div style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 14px; flex-wrap: wrap;">
+        <div class="form-group" style="margin: 0; min-width: 280px; flex: 1;">
+          <label>اختر المورد</label>
+          <select id="repSupplierSelect" class="form-control" onchange="Reports.fetchFullSupplierStatement()">
+            <option value="">-- اختر المورد لعرض كشف الحساب --</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>من تاريخ</label>
+          <input type="date" id="repSupplierFromDate" class="form-control">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>إلى تاريخ</label>
+          <input type="date" id="repSupplierToDate" class="form-control">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="Reports.fetchFullSupplierStatement()" style="display: inline-flex; align-items: center; gap: 6px;">
+          <span>عرض الكشف</span>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="Reports.printSupplierStatement()" style="display: inline-flex; align-items: center; gap: 6px;" title="طباعة كشف الحساب الحالي">
+          <span>طباعة كشف الحساب (PDF)</span>
+        </button>
+      </div>
+
+      <div id="repSupplierInfo"></div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>نوع الحركة</th>
+              <th>المرجع</th>
+              <th>دائن (مستحق له)</th>
+              <th>مدين (مسدد له)</th>
+              <th>الرصيد التراكمي</th>
+              <th>البيان والملاحظات</th>
+            </tr>
+          </thead>
+          <tbody id="repSupplierStatementTable">
+            <tr><td colspan="7" style="text-align: center; padding: 25px; color: var(--text-secondary);">يرجى اختيار مورد لعرض كشف الحساب</td></tr>
+          </tbody>
+          <tfoot id="repSupplierStatementFooter"></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

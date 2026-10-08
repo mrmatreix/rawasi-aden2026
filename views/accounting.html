@@ -1,0 +1,96 @@
+<section id="journalView" class="app-view-section" style="display: none;">
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title" id="journalPageTitle">سجل وإدارة قيود اليومية العامة (طرفين مدين ودائن)</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">توثيق العمليات المحاسبية المزدوجة المتزنة، القيود اليدوية والتسويات، وتتبع حركات الأستاذ العام</p>
+          </div>
+          <div class="page-actions" id="journalHeaderActions">
+            <button class="btn btn-primary" id="btnNewJournalAction" onclick="Accounting.openNewJournalModal()">
+              <svg class="icon" width="16" height="16"><use href="#icon-plus"></use></svg>
+              <span>تسجيل قيد يومية جديد +</span>
+            </button>
+            <button class="btn btn-secondary" onclick="Accounting.loadJournalEntries()">
+              <svg class="icon" width="16" height="16"><use href="#icon-refresh"></use></svg>
+              <span>تحديث</span>
+            </button>
+            <button class="btn btn-secondary" onclick="Accounting.exportJournalToExcel()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              <span>تصدير Excel</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- بطاقات ملخص القيود اليومية والتوازن المحاسبي -->
+        <div class="kpi-grid" style="margin-bottom: 20px;">
+          <div class="kpi-card kpi-total-proj">
+            <div class="kpi-content">
+              <span class="kpi-label">إجمالي القيود المسجلة</span>
+              <span class="kpi-value" id="journalKpiCount">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            </div>
+          </div>
+          <div class="kpi-card kpi-income">
+            <div class="kpi-content">
+              <span class="kpi-label">إجمالي الحركات المدينة (منه)</span>
+              <span class="kpi-value" id="journalKpiDebit">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
+            </div>
+          </div>
+          <div class="kpi-card kpi-expense">
+            <div class="kpi-content">
+              <span class="kpi-label">إجمالي الحركات الدائنة (له)</span>
+              <span class="kpi-value" id="journalKpiCredit">0</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+          </div>
+          <div class="kpi-card kpi-cash">
+            <div class="kpi-content">
+              <span class="kpi-label">حالة التوازن المحاسبي</span>
+              <span class="kpi-value" id="journalKpiBalance" style="color: var(--accent-green); font-size: 1.15rem;">متزن 100%</span>
+            </div>
+            <div class="kpi-icon-wrap">
+              <svg class="icon" width="24" height="24"><use href="#icon-check"></use></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- جدول القيود اليومية والفلترة -->
+        <div class="panel-card">
+          <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
+            <h3 class="panel-title">قائمة القيود المحاسبية اليومية المزدوجة</h3>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <input type="text" id="journalSearchInput" class="form-control" placeholder="بحث برقم القيد أو البيان أو الحساب..." style="max-width: 250px;" oninput="Accounting.filterJournalTable()">
+              <select id="journalRefFilter" class="form-control" style="max-width: 170px;" onchange="Accounting.filterJournalTable()">
+                <option value="">كافة المراجع...</option>
+                <option value="قيد يدوي">قيد يدوي</option>
+                <option value="سند صرف">سند صرف</option>
+                <option value="سند قبض">سند قبض</option>
+                <option value="ترحيل رواتب">ترحيل رواتب</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>رقم القيد</th>
+                  <th>التاريخ</th>
+                  <th>البيان العام</th>
+                  <th>نوع المرجع</th>
+                  <th>إجمالي المدين</th>
+                  <th>إجمالي الدائن</th>
+                  <th>الحالة</th>
+                  <th style="text-align: center;">الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="fullJournalTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>

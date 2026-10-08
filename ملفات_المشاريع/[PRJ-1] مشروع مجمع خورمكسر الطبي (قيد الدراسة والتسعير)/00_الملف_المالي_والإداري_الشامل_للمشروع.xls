@@ -1,0 +1,106 @@
+﻿
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+          xmlns:x="urn:schemas-microsoft-com:office:excel" 
+          xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <!--[if gte mso 9]>
+      <xml>
+        <x:ExcelWorkbook>
+          <x:ExcelWorksheets>
+            <x:ExcelWorksheet>
+              <x:Name>الملف الشامل للمشروع</x:Name>
+              <x:WorksheetOptions>
+                <x:DisplayRightToLeft/>
+                <x:DoNotDisplayGridlines/>
+                <x:Selected/>
+              </x:WorksheetOptions>
+            </x:ExcelWorksheet>
+          </x:ExcelWorksheets>
+        </x:ExcelWorkbook>
+      </xml>
+      <![endif]-->
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; direction: rtl; background-color: #ffffff; }
+        table { border-collapse: collapse; width: 100%; direction: rtl; }
+      </style>
+    </head>
+    <body>
+      <table>
+        <tr>
+          <td colspan="4" style="background-color:#0f2744; color:#d4af37; font-size:16pt; font-weight:bold; text-align:center; padding:12px; border:1.5pt solid #0f2744;">
+            شركة رواسي عدن للهندسة والمقاولات
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4" style="background-color:#1a365d; color:#ffffff; font-size:12pt; font-weight:bold; text-align:center; padding:8px; border:1pt solid #1a365d;">
+            الملف المالي والإداري الشامل لمشروع [PRJ] مشروع مجمع خورمكسر الطبي (قيد الدراسة والتسعير)
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4" style="background-color:#f8fafc; color:#475569; font-size:9.5pt; text-align:center; padding:6px; border:0.5pt solid #cbd5e1;">
+            تاريخ التصدير: 2026-10-04 | شعار الشركة: نبني الحاضر لنستثمر المستقبل
+          </td>
+        </tr>
+        <tr><td colspan="4" style="height:12px; border:none;"></td></tr>
+        
+      <tr>
+        
+          <td colspan="2" style="background:#f8fafc; border:1pt solid #cbd5e1; text-align:center; padding:10px;">
+            <div style="font-size:9pt; color:#64748b;">القيمة التعاقدية المعدلة</div>
+            <div style="font-size:13pt; font-weight:bold; color:#0f2744;">2,911,500 ر.ي</div>
+          </td>
+        
+          <td colspan="2" style="background:#f8fafc; border:1pt solid #cbd5e1; text-align:center; padding:10px;">
+            <div style="font-size:9pt; color:#64748b;">التكلفة الفعلية المنصرفة</div>
+            <div style="font-size:13pt; font-weight:bold; color:#dc2626;">0 ر.ي</div>
+          </td>
+        
+          <td colspan="2" style="background:#f8fafc; border:1pt solid #cbd5e1; text-align:center; padding:10px;">
+            <div style="font-size:9pt; color:#64748b;">الربح المالي الفعلي المحقق</div>
+            <div style="font-size:13pt; font-weight:bold; color:#059669;">2,911,500 ر.ي</div>
+          </td>
+        
+          <td colspan="2" style="background:#f8fafc; border:1pt solid #cbd5e1; text-align:center; padding:10px;">
+            <div style="font-size:9pt; color:#64748b;">نسبة الإنجاز</div>
+            <div style="font-size:13pt; font-weight:bold; color:#2563eb;">0%</div>
+          </td>
+        
+      </tr>
+      <tr><td colspan="4" style="height:10px; border:none;"></td></tr>
+    
+        <tr>
+    <th style="background-color:#0f2744; color:#ffffff; font-size:10.5pt; font-weight:bold; padding:8px 10px; border:1pt solid #334155; text-align:center;">
+      البند والمؤشر المالي والهندسي
+    </th>
+  
+    <th style="background-color:#0f2744; color:#ffffff; font-size:10.5pt; font-weight:bold; padding:8px 10px; border:1pt solid #334155; text-align:center;">
+      المبلغ والقيمة الرقمية
+    </th>
+  
+    <th style="background-color:#0f2744; color:#ffffff; font-size:10.5pt; font-weight:bold; padding:8px 10px; border:1pt solid #334155; text-align:center;">
+      العملة
+    </th>
+  
+    <th style="background-color:#0f2744; color:#ffffff; font-size:10.5pt; font-weight:bold; padding:8px 10px; border:1pt solid #334155; text-align:center;">
+      الحالة والبيان التفصيلي
+    </th>
+  </tr>
+        <tr style="background-color:#ffffff;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">اسم المشروع الرسمي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">مشروع مجمع خورمكسر الطبي (قيد الدراسة والتسعير)</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">-</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">كود: PRJ</td></tr><tr style="background-color:#f8fafc;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">العميل / المالك</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">علوي محمد خميس عمره باعبيد</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">-</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">الهاتف: 773413937</td></tr><tr style="background-color:#ffffff;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">قيمة العقد الأصلية</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">2,911,500</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">عقد أولي</td></tr><tr style="background-color:#f8fafc;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">أوامر التغيير والإضافيات المعتمدة</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">+0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">0 أوامر تغيير مسجلة</td></tr><tr style="background-color:#ffffff;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">القيمة التعاقدية المعدلة النهائية</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">2,911,500</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">شامل الإضافيات</td></tr><tr style="background-color:#f8fafc;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">التكلفة التقديرية (الميزانية المستهدفة)</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">52,000,000</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">الميزانية التقديرية</td></tr><tr style="background-color:#ffffff;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">التكلفة الفعلية المنصرفة الكلية</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">مصروفات: 0 | عمالة: 0</td></tr><tr style="background-color:#f8fafc;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">إجمالي المستخلصات المفوترة</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">0 مستخلصات</td></tr><tr style="background-color:#ffffff;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">صافي المستخلصات المعتمدة</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">بعد خصم الدفعة المقدمة وضمان الأعمال</td></tr><tr style="background-color:#f8fafc;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">إجمالي المقبوضات النقدية من العميل</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">المحصل فعلياً في الصندوق/البنك</td></tr><tr style="background-color:#ffffff;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">مشتريات مواد المشروع الكلية</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">0 فواتير توريد</td></tr><tr style="background-color:#f8fafc;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">المسدد لموردي المشروع</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">المسدد للموردين</td></tr><tr style="background-color:#ffffff;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">المتبقي مستحق لموردي المشروع</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">التزامات قائمة للموردين</td></tr><tr style="background-color:#f8fafc;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">إجمالي نثريات وعهد المشروع</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">0</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">المصروف منها: 0</td></tr><tr style="background-color:#ffffff;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">نسبة الإنجاز الفعلية للمشروع</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">0%</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">-</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">قيد التنفيذ</td></tr><tr style="background-color:#f8fafc;"><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:center; font-size:10pt; ">الربح المالي الفعلي المحقق</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:left; font-size:10pt; mso-number-format:"\#\,\#\#0"; font-family:Consolas, monospace;">2,911,500</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ر.ي</td><td style="padding:6px 10px; border:0.5pt solid #cbd5e1; text-align:right; font-size:10pt; ">ربح صافي محقق</td></tr>
+        
+        <tr><td colspan="4" style="height:25px; border:none;"></td></tr>
+        <tr>
+          <td colspan="1" style="text-align:center; font-weight:bold; border:none; padding-top:15px; color:#475569;">
+            المسؤول المالي: ___________________
+          </td>
+          <td colspan="1" style="text-align:center; font-weight:bold; border:none; padding-top:15px; color:#475569;">
+            مهندس المشروع: ___________________
+          </td>
+          <td colspan="2" style="text-align:center; font-weight:bold; border:none; padding-top:15px; color:#475569;">
+            المدير العام: ___________________
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  

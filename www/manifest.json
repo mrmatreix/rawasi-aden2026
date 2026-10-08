@@ -1,0 +1,32 @@
+{
+  "name": "نظام رواسي عدن للهندسة والمقاولات",
+  "short_name": "رواسي عدن",
+  "description": "النظام المحاسبي والإداري المتكامل - شركة رواسي عدن للهندسة والمقاولات",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a1224",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "images/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "business",
+    "productivity",
+    "finance"
+  ]
+}

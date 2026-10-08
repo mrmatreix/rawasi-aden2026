@@ -1,0 +1,13 @@
+{
+  "appId": "com.rawasiaden.app",
+  "appName": "رواسي عدن",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "cleartext": true,
+    "androidScheme": "http"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

@@ -1,0 +1,11 @@
+node_modules
+server
+android
+src_exe
+*.exe
+*.zip
+*.rar
+*.docx
+*.pdf
+.git
+.github

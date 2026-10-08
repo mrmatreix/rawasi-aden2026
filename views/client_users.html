@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة حسابات بوابة وتطبيق العملاء - شركة رواسي عدن للهندسة والمقاولات</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .portal-badge {
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-owner { background: rgba(212, 175, 55, 0.15); color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.3); }
+    .badge-manager { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-viewer { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-active { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .badge-inactive { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-slate-800/80 backdrop-blur p-6 rounded-2xl border border-slate-700 shadow-xl">
+      <div>
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-white">إدارة حسابات بوابة وتطبيق العملاء (Client Portal)</h1>
+            <p class="text-sm text-slate-400">إدارة وصول العملاء لتطبيق أندرويد والبوابة، تحديد الصلاحيات والمشاريع المسموحة</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="openCreateUserModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition flex items-center gap-2 shadow-lg shadow-amber-500/20">
+          <i class="fa-solid fa-user-plus"></i> إضافة حساب عميل جديد
+        </button>
+        <button onclick="loadClientUsers()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition flex items-center gap-2">
+          <i class="fa-solid fa-rotate"></i> تحديث
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-slate-800/60 p-5 rounded-2xl border border-slate-700">
+        <div class="text-slate-400 text-sm mb-1">إجمالي الحسابات</div>
+        <div id="statTotalUsers" class="text-3xl font-bold text-white">0</div>
+      </div>
+      <div class="bg-slate-800/60 p-5 rounded-2xl border border-slate-700">
+        <div class="text-slate-400 text-sm mb-1">الحسابات النشطة</div>
+        <div id="statActiveUsers" class="text-3xl font-bold text-emerald-400">0</div>
+      </div>
+      <div class="bg-slate-800/60 p-5 rounded-2xl border border-slate-700">
+        <div class="text-slate-400 text-sm mb-1">مفعل 2FA (التحقق بخطوتين)</div>
+        <div id="stat2faUsers" class="text-3xl font-bold text-amber-400">0</div>
+      </div>
+      <div class="bg-slate-800/60 p-5 rounded-2xl border border-slate-700">
+        <div class="text-slate-400 text-sm mb-1">الأجهزة المسجلة (Android)</div>
+        <div id="statDevices" class="text-3xl font-bold text-blue-400">0</div>
+      </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="bg-slate-800/80 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+      <div class="p-5 border-b border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <div class="relative flex-1 md:w-80">
+            <i class="fa-solid fa-magnifying-glass absolute right-3 top-3.5 text-slate-400"></i>
+            <input id="searchInput" oninput="filterUsers()" type="text" placeholder="بحث بالاسم أو البريد أو العميل..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pr-10 pl-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-right text-sm">
+          <thead class="bg-slate-900/60 text-slate-400 uppercase text-xs border-b border-slate-700">
+            <tr>
+              <th class="px-6 py-4">مستخدم العميل</th>
+              <th class="px-6 py-4">الشركة / العميل</th>
+              <th class="px-6 py-4">الدور والصلاحية</th>
+              <th class="px-6 py-4">المشاريع المسموحة</th>
+              <th class="px-6 py-4">الأمان والـ 2FA</th>
+              <th class="px-6 py-4">آخر دخول</th>
+              <th class="px-6 py-4">الحالة</th>
+              <th class="px-6 py-4 text-center">الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody" class="divide-y divide-slate-700/60">
+            <tr>
+              <td colspan="8" class="text-center py-8 text-slate-400">جاري تحميل حسابات العملاء...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Edit User Modal -->
+  <div id="userModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-4 mb-5">
+        <h3 id="modalTitle" class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-amber-400"></i> إضافة مستخدم عميل جديد
+        </h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="userForm" onsubmit="saveClientUser(event)" class="space-y-4">
+        <input type="hidden" id="userId">
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">العميل التابع له *</label>
+          <select id="userClientId" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+            <option value="">اختر العميل...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">الاسم الكامل *</label>
+          <input id="userFullName" type="text" required placeholder="مثال: م. أحمد صالح بن محفوظ" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">البريد الإلكتروني *</label>
+            <input id="userEmail" type="email" required placeholder="client@example.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">رقم الهاتف</label>
+            <input id="userPhone" type="tel" placeholder="77xxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <div id="passwordFieldGroup">
+          <label class="block text-xs font-medium text-slate-300 mb-1">كلمة المرور *</label>
+          <input id="userPassword" type="password" placeholder="6 أحرف أو أرقام كحد أدنى" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">الدور الوظيفي</label>
+            <select id="userRole" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+              <option value="owner">مالك (صلاحية كاملة واعتماد)</option>
+              <option value="manager">مدير ممثل (اطلاع واعتماد)</option>
+              <option value="viewer" selected>مطلع فقط (عرض ومتابعة)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">حالة الحساب</label>
+            <select id="userStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+              <option value="active" selected>نشط (Active)</option>
+              <option value="inactive">معطل (Inactive)</option>
+              <option value="suspended">موقوف (Suspended)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-700 flex items-center justify-between">
+          <div>
+            <div class="text-sm font-semibold text-white">تفعيل التحقق بخطوتين (2FA / OTP)</div>
+            <div class="text-xs text-slate-400">إرسال رمز أمان OTP عند تسجيل الدخول</div>
+          </div>
+          <input id="user2fa" type="checkbox" checked class="w-5 h-5 accent-amber-500 rounded">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
+          <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl text-sm font-semibold transition">إلغاء</button>
+          <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-sm font-bold transition">حفظ التغييرات</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let allUsers = [];
+
+    async function loadClientUsers() {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const res = await fetch('/api/admin/client-users', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          allUsers = data.users || [];
+          renderUsers(allUsers);
+          updateStats(allUsers);
+        }
+      } catch (err) {
+        console.error('Error loading client users:', err);
+      }
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById('usersTableBody');
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">لا توجد حسابات عملاء مسجلة حالياً</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const roleBadge = u.role === 'owner' ? 'badge-owner' : (u.role === 'manager' ? 'badge-manager' : 'badge-viewer');
+        const roleLabel = u.role === 'owner' ? 'مالك' : (u.role === 'manager' ? 'مدير ممثل' : 'مطلع فقط');
+        const statusBadge = u.status === 'active' ? 'badge-active' : 'badge-inactive';
+        const statusLabel = u.status === 'active' ? 'نشط' : (u.status === 'suspended' ? 'موقوف' : 'معطل');
+
+        return `
+          <tr class="hover:bg-slate-700/30 transition">
+            <td class="px-6 py-4">
+              <div class="font-bold text-white">${u.full_name}</div>
+              <div class="text-xs text-slate-400">${u.email}</div>
+              ${u.phone ? `<div class="text-xs text-slate-500">${u.phone}</div>` : ''}
+            </td>
+            <td class="px-6 py-4">
+              <div class="font-semibold text-slate-200">${u.client_name || '—'}</div>
+              <div class="text-xs text-slate-400">${u.client_company || ''}</div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="portal-badge ${roleBadge}">${roleLabel}</span>
+            </td>
+            <td class="px-6 py-4">
+              <span class="text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                ${u.role === 'owner' ? 'جميع المشاريع' : `${u.assigned_projects_count || 0} مشاريع`}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              ${u.two_factor_enabled ? '<span class="text-xs text-emerald-400"><i class="fa-solid fa-shield-halved"></i> مفعّل</span>' : '<span class="text-xs text-slate-500">معطل</span>'}
+            </td>
+            <td class="px-6 py-4 text-xs text-slate-400">
+              ${u.last_login_at ? new Date(u.last_login_at).toLocaleDateString('ar-YE') : 'لم يدخل بعد'}
+            </td>
+            <td class="px-6 py-4">
+              <span class="portal-badge ${statusBadge}">${statusLabel}</span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="editUser(${u.id})" class="p-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="resetPassword(${u.id})" class="p-2 bg-slate-700 hover:bg-amber-600 hover:text-slate-950 text-slate-200 rounded-lg transition" title="إعادة تعيين كلمة المرور"><i class="fa-solid fa-key"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateStats(users) {
+      document.getElementById('statTotalUsers').innerText = users.length;
+      document.getElementById('statActiveUsers').innerText = users.filter(u => u.status === 'active').length;
+      document.getElementById('stat2faUsers').innerText = users.filter(u => u.two_factor_enabled).length;
+      document.getElementById('statDevices').innerText = users.filter(u => u.device_platform === 'android').length;
+    }
+
+    function filterUsers() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allUsers.filter(u => 
+        (u.full_name && u.full_name.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.client_name && u.client_name.toLowerCase().includes(q))
+      );
+      renderUsers(filtered);
+    }
+
+    async function loadClientsList() {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const res = await fetch('/api/clients', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const select = document.getElementById('userClientId');
+        select.innerHTML = '<option value="">اختر العميل...</option>';
+        if (data.data || Array.isArray(data)) {
+          const list = data.data || data;
+          list.forEach(c => {
+            select.innerHTML += `<option value="${c.id}">${c.name} ${c.company ? `(${c.company})` : ''}</option>`;
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function openCreateUserModal() {
+      document.getElementById('userId').value = '';
+      document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-user-plus text-amber-400"></i> إضافة مستخدم عميل جديد';
+      document.getElementById('passwordFieldGroup').style.display = 'block';
+      document.getElementById('userPassword').required = true;
+      document.getElementById('userForm').reset();
+      loadClientsList();
+      document.getElementById('userModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('userModal').classList.add('hidden');
+    }
+
+    async function saveClientUser(e) {
+      e.preventDefault();
+      const id = document.getElementById('userId').value;
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+      const payload = {
+        client_id: document.getElementById('userClientId').value,
+        full_name: document.getElementById('userFullName').value,
+        email: document.getElementById('userEmail').value,
+        phone: document.getElementById('userPhone').value,
+        role: document.getElementById('userRole').value,
+        status: document.getElementById('userStatus').value,
+        two_factor_enabled: document.getElementById('user2fa').checked
+      };
+
+      if (!id) {
+        payload.password = document.getElementById('userPassword').value;
+      }
+
+      const url = id ? `/api/admin/client-users/${id}` : '/api/admin/client-users';
+      const method = id ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        closeModal();
+        loadClientUsers();
+      } else {
+        alert(data.message || 'خطأ أثناء الحفظ');
+      }
+    }
+
+    async function resetPassword(id) {
+      const newPass = prompt('أدخل كلمة المرور الجديدة للحساب (6 أحرف على الأقل):');
+      if (!newPass) return;
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const res = await fetch(`/api/admin/client-users/${id}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ new_password: newPass })
+      });
+      const data = await res.json();
+      alert(data.message || 'تم تحديث كلمة المرور');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadClientUsers();
+    });
+  </script>
+</body>
+</html>

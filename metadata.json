@@ -1,0 +1,8 @@
+{
+  "name": "نظام رواسي عدن للهندسة والمقاولات",
+  "description": "النظام المحاسبي والإداري المتكامل لإدارة المشاريع والمقاولات والمشتريات والمخازن والمالية والحسابات العامة",
+  "requestFrame": "auto",
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

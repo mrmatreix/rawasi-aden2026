@@ -1,0 +1,228 @@
+<section id="hrView" class="app-view-section" style="display:none;">
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title">إدارة الموارد البشرية والأجور</h2>
+            <p style="color:var(--text-secondary);font-size:.85rem;margin-top:4px;">ملفات الموظفين، أنواع الإجازات، الحضور، السلف، مسيرات الرواتب والترحيل المالي، وتقييم الأداء</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary" onclick="HR.load()">تحديث</button>
+            <button class="btn btn-primary" onclick="HR.openEmployeeModal()">+ موظف جديد</button>
+          </div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-content"><span class="kpi-label">الموظفون النشطون</span><span class="kpi-value" id="hrActiveEmployees">0</span></div><div class="kpi-icon-wrap">👥</div></div>
+          <div class="kpi-card"><div class="kpi-content"><span class="kpi-label">حضور اليوم</span><span class="kpi-value" id="hrPresentToday">0</span></div><div class="kpi-icon-wrap">✓</div></div>
+          <div class="kpi-card"><div class="kpi-content"><span class="kpi-label">رواتب بانتظار الصرف</span><span class="kpi-value" id="hrUnpaidPayroll">0</span></div><div class="kpi-icon-wrap">💰</div></div>
+          <div class="kpi-card"><div class="kpi-content"><span class="kpi-label">رصيد السلف المستحقة</span><span class="kpi-value" id="hrActiveAdvances">0</span></div><div class="kpi-icon-wrap">📌</div></div>
+        </div>
+        <div class="report-tabs-bar" style="margin-bottom:20px;">
+          <button class="report-tab-btn active" onclick="HR.showPane('employees',this)">الموظفون</button>
+          <button class="report-tab-btn" onclick="HR.showPane('leaveTypes',this)">أنواع وسياسات الإجازات</button>
+          <button class="report-tab-btn" onclick="HR.showPane('attendance',this)">الحضور والانصراف</button>
+          <button class="report-tab-btn" onclick="HR.showPane('leaves',this)">طلبات الإجازات</button>
+          <button class="report-tab-btn" onclick="HR.showPane('advances',this)">سلف الموظفين</button>
+          <button class="report-tab-btn" onclick="HR.showPane('payroll',this)">مسيرات الرواتب والترحيل</button>
+          <button class="report-tab-btn" onclick="HR.showPane('evaluations',this)">تقييم الأداء والحوافز</button>
+        </div>
+
+        <div id="hrPane_employees" class="hr-pane">
+          <div class="panel-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead><tr><th>الرقم</th><th>الموظف</th><th>المسمى</th><th>القسم</th><th>المشروع</th><th>الراتب</th><th>الحالة</th><th>إجراء</th></tr></thead>
+                <tbody id="hrEmployeesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="hrPane_leaveTypes" class="hr-pane" style="display:none;">
+          <div class="panel-card" style="margin-bottom:14px;">
+            <h4 style="margin-bottom:12px;color:var(--gold-light);">إضافة نوع إجازة جديد</h4>
+            <form onsubmit="HR.submitLeaveType(event)" class="form-grid">
+              <div class="form-group"><label>اسم نوع الإجازة</label><input id="hrLtName" class="form-control" placeholder="مثال: سنوية، مرضية..." required></div>
+              <div class="form-group"><label>الأيام المستحقة سنوياً</label><input id="hrLtDays" class="form-control" type="number" value="30" required></div>
+              <div class="form-group"><label>طبيعة الإجازة</label><select id="hrLtIsPaid" class="form-control"><option value="1">مدفوعة الراتب</option><option value="0">بدون راتب</option></select></div>
+              <div class="form-group"><label>الوصف والسياسة</label><input id="hrLtDesc" class="form-control" placeholder="ملاحظات الشروط والسياسة..."></div>
+              <button class="btn btn-primary" type="submit">حفظ نوع الإجازة</button>
+            </form>
+          </div>
+          <div class="panel-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead><tr><th>النوع</th><th>الرصيد السنوي</th><th>الاستحقاق المالي</th><th>الوصف والسياسة</th></tr></thead>
+                <tbody id="hrLeaveTypesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="hrPane_attendance" class="hr-pane" style="display:none;">
+          <div class="panel-card">
+            <form onsubmit="HR.submitAttendance(event)" class="form-grid">
+              <div class="form-group"><label>التاريخ</label><input id="hrAttendanceDate" class="form-control" type="date" onchange="HR.loadAttendance()"></div>
+              <div class="form-group"><label>الموظف</label><select id="hrAttendanceEmployee" class="form-control" required></select></div>
+              <div class="form-group"><label>الحالة</label><select id="hrAttendanceStatus" class="form-control"><option value="present">حاضر</option><option value="late">متأخر</option><option value="absent">غائب</option><option value="leave">إجازة</option></select></div>
+              <div class="form-group"><label>دخول</label><input id="hrCheckIn" class="form-control" type="time"></div>
+              <div class="form-group"><label>خروج</label><input id="hrCheckOut" class="form-control" type="time"></div>
+              <div class="form-group"><label>إضافي</label><input id="hrOvertime" class="form-control" type="number" value="0"></div>
+              <div class="form-group"><label>ملاحظات</label><input id="hrAttendanceNotes" class="form-control"></div>
+              <button class="btn btn-primary" type="submit">حفظ السجل</button>
+            </form>
+          </div>
+          <div class="panel-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead><tr><th>الرقم</th><th>الموظف</th><th>الحالة</th><th>الدخول</th><th>الخروج</th><th>إضافي</th><th>ملاحظات</th></tr></thead>
+                <tbody id="hrAttendanceTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="hrPane_leaves" class="hr-pane" style="display:none;">
+          <div class="panel-card">
+            <form onsubmit="HR.submitLeave(event)" class="form-grid">
+              <div class="form-group"><label>الموظف</label><select id="hrLeaveEmployee" class="form-control" required></select></div>
+              <div class="form-group"><label>نوع الإجازة</label><select id="hrLeaveType" class="form-control"><option>سنوية</option><option>مرضية</option><option>طارئة</option><option>بدون راتب</option><option>حج وعمرة</option></select></div>
+              <div class="form-group"><label>من</label><input id="hrLeaveStart" class="form-control" type="date" required></div>
+              <div class="form-group"><label>إلى</label><input id="hrLeaveEnd" class="form-control" type="date" required></div>
+              <div class="form-group"><label>الأيام</label><input id="hrLeaveDays" class="form-control" type="number" value="1"></div>
+              <button class="btn btn-primary" type="submit">تسجيل طلب الإجازة</button>
+            </form>
+          </div>
+          <div class="panel-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead><tr><th>الموظف</th><th>النوع</th><th>الفترة</th><th>الأيام</th><th>الحالة</th><th>إجراء</th></tr></thead>
+                <tbody id="hrLeavesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="hrPane_advances" class="hr-pane" style="display:none;">
+          <div class="panel-card">
+            <form onsubmit="HR.submitAdvance(event)" class="form-grid">
+              <div class="form-group"><label>الموظف</label><select id="hrAdvanceEmployee" class="form-control" required></select></div>
+              <div class="form-group"><label>المبلغ</label><input id="hrAdvanceAmount" class="form-control" type="number" required></div>
+              <div class="form-group"><label>التاريخ</label><input id="hrAdvanceDate" class="form-control" type="date" required></div>
+              <div class="form-group"><label>القسط الشهري</label><input id="hrAdvanceInstallment" class="form-control" type="number" value="0"></div>
+              <button class="btn btn-primary" type="submit">تسجيل السلفة</button>
+            </form>
+          </div>
+          <div class="panel-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead><tr><th>الموظف</th><th>التاريخ</th><th>السلفة</th><th>المسدد</th><th>المتبقي</th><th>القسط</th><th>الحالة</th></tr></thead>
+                <tbody id="hrAdvancesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="hrPane_payroll" class="hr-pane" style="display:none;">
+          <div class="panel-card" style="display:flex;gap:12px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px;padding:14px 18px;">
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;">
+                <label style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;font-weight:600;">شهر المسير</label>
+                <input id="hrPayrollMonth" class="form-control" type="month" onchange="HR.loadPayroll()" style="height:38px;min-width:145px;">
+              </div>
+              <button class="btn btn-primary" onclick="HR.generatePayroll()" style="height:38px;display:inline-flex;align-items:center;gap:6px;">
+                <span>1. إعداد مسير الرواتب</span>
+              </button>
+              <button class="btn btn-success" style="height:38px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;display:inline-flex;align-items:center;gap:6px;" onclick="HR.postPayrollToJournal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                <span>2. ترحيل إلى قيد يومية متزن ⚡</span>
+              </button>
+              <button class="btn btn-secondary" onclick="HR.exportPayrollToExcel()" title="تصدير كشف الراتب الشامل إلى Excel" style="height:38px;display:inline-flex;align-items:center;gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                <span>تصدير Excel 📊</span>
+              </button>
+              <button class="btn btn-secondary" onclick="HR.printComprehensivePayroll()" title="طباعة كشف الراتب الشامل الرسمي" style="height:38px;display:inline-flex;align-items:center;gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+                <span>طباعة الكشف 🖨️</span>
+              </button>
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button type="button" class="btn-statutory-pill" onclick="HR.showStatutoryRulesModal()" title="دليل القواعد النظامية والضريبية لاحتساب الأجور">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                <span>قواعد التأمينات والضرائب النظامية</span>
+                <span class="badge-legal">المعايير المعتمدة ⚖️</span>
+              </button>
+            </div>
+          </div>
+          <div class="panel-card" style="padding:0;overflow:hidden;border:1px solid var(--border-color);border-radius:10px;">
+            <div id="payrollSheetHeaderBanner" style="background:#059669;color:#ffffff;text-align:center;padding:12px 16px;font-size:1.25rem;font-weight:bold;letter-spacing:0.5px;">
+              كشف الراتب الشامل لشهر اغسطس ٢٠٢٦م
+            </div>
+            <div class="table-responsive" style="max-height:650px;overflow-x:auto;">
+              <table id="hrComprehensivePayrollTable" class="custom-table" style="font-size:0.8rem;white-space:nowrap;margin:0;width:100%;text-align:center;">
+                <thead style="position:sticky;top:0;z-index:10;background:var(--bg-secondary);">
+                  <tr style="background:#1e293b;color:#f8fafc;">
+                    <th rowspan="2" style="vertical-align:middle;">م</th>
+                    <th rowspan="2" style="vertical-align:middle;min-width:140px;">الاسم</th>
+                    <th rowspan="2" style="vertical-align:middle;min-width:120px;">الوظيفة</th>
+                    <th rowspan="2" style="vertical-align:middle;">الرقم الوظيفي</th>
+                    <th rowspan="2" style="vertical-align:middle;">عدد الايام</th>
+                    <th rowspan="2" style="vertical-align:middle;">رقم الحساب</th>
+                    <th rowspan="2" style="vertical-align:middle;min-width:120px;">مركز التكلفه</th>
+                    <th rowspan="2" style="vertical-align:middle;">عدد ايام العمل</th>
+                    <th rowspan="2" style="vertical-align:middle;">الراتب الاساسي</th>
+                    <th rowspan="2" style="vertical-align:middle;">الاستحقاق الراتب الاساسي</th>
+                    <th colspan="6" style="background:#1e3a8a;color:#93c5fd;text-align:center;border-left:1px solid rgba(255,255,255,0.1);border-right:1px solid rgba(255,255,255,0.1);">الراتب الاساسي والبدلات</th>
+                    <th colspan="4" style="background:#451a03;color:#fdba74;text-align:center;border-left:1px solid rgba(255,255,255,0.1);border-right:1px solid rgba(255,255,255,0.1);">الاستقطاعات</th>
+                    <th rowspan="2" style="vertical-align:middle;">الوعاء</th>
+                    <th rowspan="2" style="vertical-align:middle;">الضريبة</th>
+                    <th rowspan="2" style="vertical-align:middle;">صافي الراتب</th>
+                    <th rowspan="2" style="vertical-align:middle;">%9 تأمين</th>
+                    <th rowspan="2" style="vertical-align:middle;">صندوق تنمية المهارات 1%</th>
+                    <th rowspan="2" style="vertical-align:middle;">الاجازة بدون راتب</th>
+                    <th rowspan="2" style="vertical-align:middle;color:var(--accent-green);">اجمالي الصافي</th>
+                    <th rowspan="2" style="vertical-align:middle;">الحالة / إجراء</th>
+                  </tr>
+                  <tr style="background:#0f172a;color:#cbd5e1;">
+                    <th>إنتقال 20%</th>
+                    <th>مظهر 25%</th>
+                    <th style="background:#fef08a;color:#854d0e;font-weight:bold;">بدل طبيعة عمل 30%</th>
+                    <th>بدل معيشة</th>
+                    <th style="background:#fef08a;color:#854d0e;font-weight:bold;">بدل تأمين صحي</th>
+                    <th style="color:var(--gold-light);font-weight:bold;">الراتب الشامل</th>
+                    <th style="color:#f87171;">التأمينات 6%</th>
+                    <th>خصميات غياب وجزاءات</th>
+                    <th>اقساط تمويل</th>
+                    <th>اجمالي الخصميات</th>
+                  </tr>
+                </thead>
+                <tbody id="hrPayrollTableBody"></tbody>
+                <tfoot id="hrPayrollTableFoot" style="position:sticky;bottom:0;z-index:5;background:#0f172a;font-weight:bold;color:#f8fafc;border-top:2px solid var(--accent-green);"></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="hrPane_evaluations" class="hr-pane" style="display:none;">
+          <div class="panel-card" style="margin-bottom:14px;">
+            <h4 style="margin-bottom:12px;color:var(--gold-light);">تسجيل تقييم أداء وحوافز/خصومات موظف</h4>
+            <form onsubmit="HR.submitEvaluation(event)" class="form-grid">
+              <div class="form-group"><label>الموظف</label><select id="hrEvalEmployee" class="form-control" required></select></div>
+              <div class="form-group"><label>تاريخ التقييم</label><input id="hrEvalDate" class="form-control" type="date"></div>
+              <div class="form-group"><label>التقدير العام</label><select id="hrEvalRating" class="form-control"><option>ممتاز</option><option selected>جيد جداً</option><option>جيد</option><option>مقبول</option><option>يحتاج تحسين</option></select></div>
+              <div class="form-group"><label>الدرجة من 100</label><input id="hrEvalScore" class="form-control" type="number" min="0" max="100" value="85"></div>
+              <div class="form-group"><label>مكافآت وحوافز</label><input id="hrEvalBonus" class="form-control" type="number" value="0"></div>
+              <div class="form-group"><label>خصومات وجزاءات</label><input id="hrEvalDeduction" class="form-control" type="number" value="0"></div>
+              <div class="form-group"><label>المسؤول عن التقييم</label><input id="hrEvalEvaluator" class="form-control" value="مدير الموارد البشرية"></div>
+              <div class="form-group"><label>ملاحظات التقييم</label><input id="hrEvalComments" class="form-control" placeholder="التوصيات ونقاط القوة..."></div>
+              <button class="btn btn-primary" type="submit">حفظ التقييم</button>
+            </form>
+          </div>
+          <div class="panel-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead><tr><th>الموظف</th><th>تاريخ التقييم</th><th>التقدير</th><th>الدرجة</th><th>المكافآت</th><th>الخصومات</th><th>المسؤول</th><th>الملاحظات</th></tr></thead>
+                <tbody id="hrEvaluationsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>

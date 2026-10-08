@@ -1,0 +1,197 @@
+<section id="inventoryView" class="app-view-section" style="display: none;">
+  <div class="page-header-row">
+    <div>
+      <h2 class="page-title">إدارة المواد والمستودعات المتقدمة (DDD & Audit System)</h2>
+      <p style="color: var(--text-secondary); margin-top: 4px; font-size: 0.9rem;">
+        نظام متكامل للجرد الدوري والمفاجئ، معالجة الفروقات والتسويات الآلية، حجر التوالف، ومرتجعات الموقع وتحويلات المشاريع.
+      </p>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button class="btn btn-secondary" onclick="Inventory.openSpotAuditModal()">🔍 جرد مفاجئ فوري</button>
+      <button class="btn btn-secondary" onclick="Inventory.openPeriodicAuditModal()">📅 جرد دوري مجدول</button>
+      <button class="btn btn-primary" onclick="Inventory.openNewItemModal()">+ إضافة مادة جديدة</button>
+    </div>
+  </div>
+
+  <!-- شريط التبويبات الرئيسي للوحدات -->
+  <div style="display: flex; gap: 10px; margin-bottom: 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; flex-wrap: wrap;">
+    <button id="tabBtn-items" class="btn btn-sm btn-primary" onclick="Inventory.switchTab('items')">📦 أرصدة المخزون والمواد</button>
+    <button id="tabBtn-audits" class="btn btn-sm btn-secondary" onclick="Inventory.switchTab('audits')">📋 الجرد والتسويات الرقابية</button>
+    <button id="tabBtn-quarantine" class="btn btn-sm btn-secondary" onclick="Inventory.switchTab('quarantine')">☣️ حجر المواد التالفة والخردة</button>
+    <button id="tabBtn-returns" class="btn btn-sm btn-secondary" onclick="Inventory.switchTab('returns')">🔄 مرتجعات الموقع وفحص الجودة (QC)</button>
+    <button id="tabBtn-transfers" class="btn btn-sm btn-secondary" onclick="Inventory.switchTab('transfers')">🔁 التحويلات بين المشاريع</button>
+    <button id="tabBtn-events" class="btn btn-sm btn-secondary" onclick="Inventory.switchTab('events')">🔐 سجل أحداث المجال المشفر</button>
+  </div>
+
+  <!-- 1. تبويب الأصناف والرصيد العام -->
+  <div id="tabContent-items" class="panel-card">
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>كود الصنف</th>
+            <th>اسم المادة</th>
+            <th>التصنيف</th>
+            <th>الوحدة</th>
+            <th>الرصيد الحالي</th>
+            <th>سعر الوحدة</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 2. تبويب الجرد والتسويات -->
+  <div id="tabContent-audits" class="panel-card" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">سجل جلسات الجرد والمحاضر الرقابية</h3>
+      <button class="btn btn-secondary btn-sm" onclick="Inventory.loadAudits()">🔄 تحديث الجلسات</button>
+    </div>
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>رقم المحضر</th>
+            <th>المستودع</th>
+            <th>النوع</th>
+            <th>الحالة</th>
+            <th>الأصناف</th>
+            <th>الفائض</th>
+            <th>العجز</th>
+            <th>صافي الانحراف</th>
+            <th>الختم الرقمي</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="auditsTableBody">
+          <tr><td colspan="10" style="text-align: center; padding: 16px;">جاري تحميل جلسات الجرد...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. تبويب حجر المواد التالفة والخردة -->
+  <div id="tabContent-quarantine" class="panel-card" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">صندوق حجر المواد التالفة والمستبعدة</h3>
+        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">المواد التالفة المعزولة محاسبياً لتفادي اختلاطها مع المخزون الصالح.</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="Inventory.openQuarantineModal()">+ عزل مادة تالفة</button>
+    </div>
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>رقم السجل</th>
+            <th>الصنف</th>
+            <th>المستودع / الصندوق</th>
+            <th>الكمية المعزولة</th>
+            <th>قيمة الخسارة</th>
+            <th>سبب التلف</th>
+            <th>الحالة</th>
+            <th>تاريخ العزل</th>
+            <th>الإجراء</th>
+          </tr>
+        </thead>
+        <tbody id="quarantineTableBody">
+          <tr><td colspan="9" style="text-align: center; padding: 16px;">لا توجد مواد في حجر التوالف</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. تبويب مرتجعات الموقع وفحص الجودة -->
+  <div id="tabContent-returns" class="panel-card" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">إيصالات إرجاع المواد من المواقع (MRR)</h3>
+        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">توثيق وفحص الجودة للمواد المرتجعة وتخفيض تكلفة المشروع آلياً.</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="Inventory.openSiteReturnModal()">+ إيصال إرجاع وفحص QC</button>
+    </div>
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>رقم الإيصال</th>
+            <th>المشروع المصدر</th>
+            <th>الصنف</th>
+            <th>الكمية</th>
+            <th>تقييم الجودة (QC)</th>
+            <th>مهندس الفحص</th>
+            <th>القيمة المستردة</th>
+            <th>تاريخ الإرجاع</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody id="siteReturnsTableBody">
+          <tr><td colspan="9" style="text-align: center; padding: 16px;">لا توجد إيصالات إرجاع مسجلة</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. تبويب التحويلات بين المشاريع -->
+  <div id="tabContent-transfers" class="panel-card" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">طلبات تحويل المواد بين المشاريع</h3>
+        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">إدارة مناقلة المواد وتوجيه التكلفة محاسبياً تحت مبدأ الرقابة الثنائية Maker-Checker.</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="Inventory.openProjectTransferModal()">+ طلب تحويل بين المشاريع</button>
+    </div>
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>رقم التحويل</th>
+            <th>من مشروع</th>
+            <th>إلى مشروع</th>
+            <th>الصنف</th>
+            <th>الكمية</th>
+            <th>القيمة المالية</th>
+            <th>الحالة</th>
+            <th>مقدم الطلب</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="projectTransfersTableBody">
+          <tr><td colspan="9" style="text-align: center; padding: 16px;">لا توجد تحويلات بين المشاريع</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 6. تبويب سجل أحداث المجال المشفر -->
+  <div id="tabContent-events" class="panel-card" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">سجل أحداث حركة المواد المشفر (Audit Hash-Chain)</h3>
+        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">سلسلة أحداث غير قابلة للحذف أو التعديل تضمن الشفافية والمساءلة الكاملة.</p>
+      </div>
+      <button class="btn btn-success btn-sm" onclick="Inventory.verifyEventsChain()">🛡️ فحص سلامة السلسلة الهاشية</button>
+    </div>
+    <div id="chainVerificationAlert" style="margin-bottom: 12px; display: none;"></div>
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>معرف الحدث</th>
+            <th>نوع الحدث</th>
+            <th>الكيان المتأثر</th>
+            <th>المستخدم</th>
+            <th>الطابع الزمني</th>
+            <th>الهاش السابق (Prev Hash)</th>
+            <th>هاش الحدث المشفر (SHA-256)</th>
+          </tr>
+        </thead>
+        <tbody id="domainEventsTableBody">
+          <tr><td colspan="7" style="text-align: center; padding: 16px;">جاري تحميل سجل الأحداث...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
